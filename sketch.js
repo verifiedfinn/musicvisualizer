@@ -25,6 +25,7 @@ function preload() {
 }
 
 function setup() {
+  getAudioContext().suspend();
   canvas = createCanvas(windowWidth, windowHeight);
   canvas.position(0, 0);
   canvas.style('z-index', '0');
@@ -106,6 +107,7 @@ function stopAllSongs() {
 }
 
 function playSong(i) {
+  getAudioContext().resume();
   stopAllSongs();
   currentSongIndex = i;
   let song = songsData[i];
@@ -374,3 +376,4 @@ function windowResized() {
   bufferGraphics.colorMode(RGB, 255);
   bufferGraphics.noStroke();
 }
+
