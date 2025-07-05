@@ -258,6 +258,25 @@ canvas {
   margin: 0 auto;
 }
 
+#ui-panel, #controls {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  z-index: 5;
+  position: relative;
+  padding: 0.5rem;
+}
+
+button, input[type="range"], #time-display {
+  flex: 1 1 auto;
+  min-width: 40px;
+}
+
 /* ---- Responsive Design for Mobile ---- */
 @media (max-width: 768px) {
   #ui-panel {
