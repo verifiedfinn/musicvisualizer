@@ -237,67 +237,89 @@ body {
   position: relative;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  background: black;
+}
+
+canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.controls {
+  width: 90vw;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
 /* ---- Responsive Design for Mobile ---- */
 @media (max-width: 768px) {
-  #controls {
+  #ui-panel {
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     gap: 10px;
-    padding: 15px;
-    bottom: 10px;
-    width: 95vw;
-    max-width: 380px;
-    box-sizing: border-box;
+    bottom: 160px;
+    max-width: 95vw;
+    padding: 10px;
   }
 
-  #playPauseBtn,
-  #replayBtn,
-  #muteBtn {
-    width: 100%;
-    max-width: 120px;
-    padding: 10px;
-    font-size: 18px;
+  #thumbnailContainer {
+    width: 90vw;
+    justify-content: center;
+    overflow-x: scroll;
+  }
+
+  .thumb, .thumbnail {
+    width: 60px;
+    height: 60px;
+  }
+
+  #controls {
+    position: fixed;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    bottom: 10px;
+    padding: 12px;
+    width: 95vw;
+    max-width: 360px;
+    box-sizing: border-box;
   }
 
   #scrubber,
   #volumeSlider {
     width: 100%;
-    max-width: 300px;
   }
 
   #time-display {
-    font-size: 14px;
-    text-align: center;
+    font-size: 12px;
   }
 
-  #volume-icon {
-    width: 20px;
-    height: 20px;
-  }
-
-  #ui-panel {
-    bottom: 170px; /* push it up above the now-taller controls */
-    flex-direction: column;
-    gap: 10px;
-    max-width: 95vw;
-  }
-
-  .thumb,
-  .thumbnail {
-    width: 60px;
-    height: 60px;
+  #playPauseBtn, #replayBtn, #muteBtn {
+    font-size: 16px;
+    padding: 6px 12px;
   }
 
   .thumbnail-title {
-    font-size: 11px;
-    text-align: center;
+    font-size: 12px;
     max-width: 60px;
-    line-height: 1.2;
   }
 
   .scroll-arrow {
-    font-size: 22px;
-    padding: 0 5px;
+    font-size: 20px;
+    padding: 0 6px;
   }
+}
+
+canvas {
+  width: 100vw !important;
+  height: 100vh !important;
+  display: block;
+  object-fit: cover;
 }
