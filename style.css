@@ -1,0 +1,231 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: black;
+}
+
+#ui-panel {
+  position: fixed;
+  bottom: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  padding: 10px;
+  max-width: fit-content;
+  z-index: 10;
+}
+
+.scroll-arrow {
+  font-size: 28px;
+  color: cyan;
+  cursor: pointer;
+  user-select: none;
+  padding: 0 10px;
+}
+
+.thumb, .thumbnail {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: 2px solid cyan;
+}
+
+.thumb:hover,
+.thumbnail:hover {
+  transform: scale(1.1);
+}
+
+#thumbnailContainer {
+  display: flex;
+  overflow-x: hidden;  /* Hides scroll bar */
+  scroll-behavior: smooth;
+  gap: 10px;
+  width: 405px; /* 4 thumbnails * 100px + margins */
+}
+
+#controls {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 10, 30, 0.9);
+  padding: 12px 20px;
+  border: 2px solid cyan;
+  border-radius: 15px;
+  box-shadow: 0 0 12px cyan;
+  z-index: 100;
+}
+
+#scrubber {
+  width: 320px;
+  accent-color: cyan;
+  border-radius: 5px;
+}
+
+#replayBtn {
+  background: none;
+  border: 1px solid cyan;
+  color: cyan;
+  font-size: 18px;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#time-display {
+  color: cyan;
+  font-family: monospace;
+  font-size: 14px;
+  width: 100px;              /* Set a fixed width */
+  text-align: center;        /* Center the time text */
+  display: inline-block;
+}
+
+#controls button {
+  background: black;
+  color: cyan;
+  font-size: 16px;
+  border: 1px solid cyan;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#controls button:hover {
+  background: #111;
+}
+
+#volume-icon {
+  filter: invert(73%) sepia(100%) saturate(746%) hue-rotate(147deg) brightness(93%) contrast(97%);
+  width: 24px;
+  height: 24px;
+  margin-left: 8px;
+}
+
+#volumeSlider {
+  width: 100px;
+  accent-color: cyan;
+  border-radius: 5px;
+}
+
+/* Loading overlay + bar */
+#loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  color: cyan;
+  font-size: 24px;
+  font-family: monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.5s;
+}
+
+#loading-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#loading-bar-container {
+  margin-top: 20px;
+  width: 50%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#loading-bar {
+  width: 0%;
+  height: 100%;
+  background: cyan;
+  transition: width 0.3s ease;
+}
+
+#volumeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+#volume-icon {
+  filter: invert(73%) sepia(100%) saturate(746%) hue-rotate(147deg) brightness(93%) contrast(97%);
+  width: 24px;
+  height: 24px;
+}
+
+#playPauseBtn {
+  width: 40px; 
+  text-align: center;
+}
+
+#muteBtn {
+  width: 40px;           /* prevent shifting */
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 18px;
+}
+
+.thumbnail-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 5px;
+  width: 100px;
+  text-align: center;
+}
+
+.thumbnail-title {
+  color: cyan;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.2;
+  margin-top: 6px;
+  max-width: 100px;
+  text-align: center;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.song-thumbnails {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  white-space: nowrap;
+  gap: 10px;
+  scroll-behavior: smooth;
+  max-width: 80vw; /* Adjust this if you want more visible */
+  padding-bottom: 5px;
+}
+
+.song-thumbnail {
+  flex: 0 0 auto;
+  margin: 0 10px;
+  text-align: center;
+}
+
+.song-thumbnails::-webkit-scrollbar {
+  height: 8px;
+}

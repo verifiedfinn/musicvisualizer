@@ -1,0 +1,75 @@
+[
+  {
+    "title": "Auburn Rain",
+    "audio": "https://static.wixstatic.com/mp3/b00180_bfe1299caf5049fea2e79379b729d7b0.mp3",
+    "thumbnail": "https://static.wixstatic.com/media/b00180_a2a8bc7adf31493a8299319388caf484~mv2.png",
+    "base": [255, 0, 0],
+    "accent": [255, 215, 0],
+    "pulse": [255, 80, 0],
+    "sensitivity": 1.1
+  },
+  {
+    "title": "Freshman Loop of Dreams",
+    "audio": "https://static.wixstatic.com/mp3/b00180_1fab02dad0e34ab088302e71ada18183.mp3",
+    "thumbnail": "https://static.wixstatic.com/media/b00180_818c067061f84358a26c2295b68b27c7~mv2.png",
+    "base": [5, 10, 40],
+    "accent": [100, 180, 250],
+    "pulse": [255, 240, 120],
+    "sensitivity": 0.85
+  },
+  {
+    "title": "UVIC Psychology Podcast",
+    "audio": "https://static.wixstatic.com/mp3/b00180_6cc0ff4957434d21b68d8f2a10aac9c5.mp3",
+    "thumbnail": "https://static.wixstatic.com/media/b00180_b2fc54e4e2ef4e8ead56e1ea9e971b83~mv2.png",
+    "base": [20, 70, 50],
+    "accent": [100, 255, 140],
+    "pulse": [250, 100, 180],
+    "sensitivity": 0.5
+  },
+  {
+    "title": "Full Improv",
+    "audio": "https://static.wixstatic.com/mp3/b00180_603d6a888923491c9e8ff98c42b2b2da.mp3",
+    "thumbnail": "https://static.wixstatic.com/media/b00180_dbd6d0ab8f27425b9bb571acfb274e90~mv2.jpg",
+    "base": [30, 5, 10],
+    "accent": [255, 80, 60],
+    "pulse": [60, 255, 190],
+    "sensitivity": 1.25
+  },
+  {
+    "title": "Trinity Audio Sprint Horror",
+    "audio": "https://static.wixstatic.com/mp3/b00180_0f28c601f89b495fa128d9e7b43e5903.mp3",
+    "thumbnail": "https://static.wixstatic.com/media/b00180_c6a793a6ffd142658cd2a49f93aa8d03~mv2.jpg",
+    "base": [20, 0, 60],
+    "accent": [140, 0, 200],
+    "pulse": [255, 220, 0],
+    "sensitivity": 1.5
+  },
+  {
+    "title": "Fiddling Mix",
+    "audio": "https://static.wixstatic.com/mp3/b00180_58055951870d46e2b5e2b6e65ebc3e2e.mp3",
+    "thumbnail": "https://static.wixstatic.com/media/b00180_38c83a7b2a14484cbf338c98299a7f96~mv2.jpg",
+    "base": [60, 20, 40],
+    "accent": [240, 80, 200],
+    "pulse": [120, 255, 240],
+    "sensitivity": 1.0
+  },
+  {
+    "title": "Love song draft",
+    "audio": "https://static.wixstatic.com/mp3/b00180_93ec15544b934640be4ccd4221d3a987.mp3",
+    "thumbnail": "https://static.wixstatic.com/media/b00180_f08ed8592d554c9fb1b876110a55c1d1~mv2.jpg",
+    "base": [40, 10, 30],
+    "accent": [255, 90, 160],
+    "pulse": [90, 255, 200],
+    "sensitivity": 1.2
+  },
+  {
+    "title": "HS 2015 Red Badge",
+    "audio": "https://static.wixstatic.com/mp3/b00180_63ab2ae285eb4162a6b9084323a22674.m4a",
+    "thumbnail": "https://static.wixstatic.com/media/b00180_01155fb4c595436fa511b93e60cb4397~mv2.jpg",
+    "base": [30, 0, 0],
+    "accent": [255, 60, 60],
+    "pulse": [180, 255, 80],
+    "sensitivity": 1.0
+  }
+]
+

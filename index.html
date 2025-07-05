@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Tron Audio Visualizer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  </head>
+  <body>
+    <main>
+      <div id="loading-overlay">
+        <div id="loading-content">
+          <div id="loading-text">Loading Player...</div>
+          <div id="loading-bar-container">
+            <div id="loading-bar"></div>
+          </div>
+        </div>
+      </div>
+
+<div id="ui-panel">
+  <div class="scroll-arrow" id="scrollLeft">❮</div>
+  <div id="thumbnailContainer" class="song-thumbnails"></div>
+  <div class="scroll-arrow" id="scrollRight">❯</div>
+</div>
+
+      <div id="controls">
+        <button id="playPauseBtn">▶</button>
+        <button id="replayBtn">⟲</button>
+        <input type="range" id="scrubber" min="0" max="1" value="0" step="0.001" />
+        <span id="time-display">0:00 / 0:00</span>
+        <button id="muteBtn"><i class="fas fa-volume-up"></i></button>
+        <input type="range" id="volumeSlider" min="0" max="1" value="0.8" step="0.01" />
+      </div>
+    </main>
+    <script src="sketch.js"></script>
+  </body>
+</html>
+
