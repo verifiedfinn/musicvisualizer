@@ -35,7 +35,14 @@
         <input type="range" id="volumeSlider" min="0" max="1" value="0.8" step="0.01" />
       </div>
     </main>
+    <script>
+  document.addEventListener('touchstart', () => {
+    const context = getAudioContext();
+    if (context.state !== 'running') {
+      context.resume();
+    }
+  }, { once: true });
+</script>
     <script src="sketch.js"></script>
   </body>
 </html>
-
