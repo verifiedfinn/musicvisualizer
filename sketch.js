@@ -107,7 +107,7 @@ function stopAllSongs() {
 }
 
 function playSong(i) {
-  getAudioContext().resume();
+   getAudioContext().resume();
   stopAllSongs();
   currentSongIndex = i;
   let song = songsData[i];
@@ -376,4 +376,5 @@ function windowResized() {
   bufferGraphics.colorMode(RGB, 255);
   bufferGraphics.noStroke();
 }
+
 
