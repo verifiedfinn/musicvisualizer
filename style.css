@@ -229,3 +229,69 @@ body {
 .song-thumbnails::-webkit-scrollbar {
   height: 8px;
 }
+
+/* ---- Responsive Design for Mobile ---- */
+@media (max-width: 768px) {
+  #ui-panel {
+    flex-wrap: wrap;
+    bottom: 100px;
+    padding: 8px;
+    gap: 6px;
+    max-width: 90vw;
+  }
+
+  #thumbnailContainer {
+    width: 90vw;
+    gap: 6px;
+  }
+
+  .thumb, .thumbnail {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+  }
+
+  #controls {
+    flex-direction: column;
+    bottom: 10px;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  #scrubber {
+    width: 80vw;
+  }
+
+  #time-display {
+    font-size: 12px;
+    width: auto;
+  }
+
+  #volumeSlider {
+    width: 80vw;
+  }
+
+  #playPauseBtn, #replayBtn, #muteBtn {
+    width: auto;
+    font-size: 14px;
+    padding: 5px 8px;
+  }
+
+  .thumbnail-title {
+    font-size: 11px;
+    max-width: 60px;
+  }
+
+  .scroll-arrow {
+    font-size: 24px;
+    padding: 0 6px;
+  }
+
+  .song-thumbnails {
+    max-width: 90vw;
+  }
+}
+
+.song-thumbnails::-webkit-scrollbar {
+  height: 8px;
+}
