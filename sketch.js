@@ -233,7 +233,7 @@ colorPalette = {
 
   bufferGraphics.background(0, 25);
   bufferGraphics.push();
-  bufferGraphics.translate(width / 2, height / 2 - 60);
+  bufferGraphics.translate(width / 2, height / 2 - 85);
   
 
   if (!started || currentSongIndex === -1) {
