@@ -15,6 +15,7 @@ let sensitivity = 1.0;
 let seeking = false;
 let wasPlayingBeforeSeek = false;
 let manualSeekTime = null;
+let isMobile = /Mobi|Android/i.test(navigator.userAgent);
 
 let scrubber, replayBtn, playPauseBtn, timeDisplay, volumeSlider, muteBtn;
 let isPlaying = false;
@@ -26,6 +27,10 @@ function preload() {
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
+  if (isMobile) {
+  pixelDensity(1); // prevent high DPI overload
+  resizeCanvas(windowWidth, windowHeight * 0.85); // slightly shorter
+}
   canvas.position(0, 0);
   canvas.style('z-index', '0');
   canvas.style('position', 'absolute');
@@ -50,7 +55,8 @@ function setup() {
   };
   colorPalette = { ...currentPalette };
 
-  for (let i = 0; i < 500; i++) particles.push(new Particle());
+  let particleCount = isMobile ? 150 : 500;
+  for (let i = 0; i < particleCount; i++) particles.push(new Particle());
 
   loadSongs();
   createSongButtons();
@@ -374,6 +380,7 @@ function windowResized() {
   bufferGraphics.colorMode(RGB, 255);
   bufferGraphics.noStroke();
 }
+
 
 
 
