@@ -26,6 +26,9 @@ function preload() {
 }
 
 function setup() {
+  if (isMobile) {
+  pixelDensity(1); // reduces retina load
+}
   canvas = createCanvas(windowWidth, windowHeight);
   if (isMobile) {
   pixelDensity(1); // prevent high DPI overload
@@ -112,6 +115,11 @@ function stopAllSongs() {
 }
 
 function playSong(i) {
+  if (getAudioContext().state !== 'running') {
+  getAudioContext().resume().then(() => {
+    console.log('AudioContext resumed');
+  });
+}
   stopAllSongs();
   currentSongIndex = i;
   let song = songsData[i];
