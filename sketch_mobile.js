@@ -8,10 +8,6 @@ let loadingProgress = 0;
 
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-function preload() {
-  songsData = loadJSON('songs.json');
-}
-
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   angleMode(RADIANS);
@@ -23,6 +19,15 @@ function setup() {
 function showStartOverlay() {
   let overlay = createDiv("Tap to Start Visualizer");
   overlay.id("startOverlay");
+
+  fetch('songs.json')
+  .then(response => response.json())
+  .then(data => {
+    songsData = data;
+    showLoadingOverlay();
+    userStartAudio();
+    loadAllSongs();
+  });
 
   Object.assign(overlay.elt.style, {
     position: "fixed",
@@ -85,33 +90,46 @@ function touchStarted() {
   }
 }
 
+let switching = false;
+
 function playSong(i) {
-  if (soundFiles[currentSongIndex]?.isPlaying()) {
+  if (switching) return;
+  switching = true;
+
+  // Stop the currently playing sound
+  if (soundFiles[currentSongIndex] && soundFiles[currentSongIndex].isPlaying()) {
     soundFiles[currentSongIndex].stop();
   }
 
+  // Set new index
   currentSongIndex = i;
+  
+
+  function afterPlay(snd) {
+    if (snd) {
+      snd.loop();
+      fft.setInput(snd);
+      updateSongTitle(i);
+    }
+    switching = false;
+  }
 
   if (soundFiles[i]) {
-    soundFiles[i].loop();
-    fft.setInput(soundFiles[i]);
+    afterPlay(soundFiles[i]);
   } else {
-    // Lazy load
     loadSound(songsData[i].audio, (loadedSound) => {
       soundFiles[i] = loadedSound;
-      loadedSound.loop();
-      fft.setInput(loadedSound);
-    }, (err) => {
-      console.error("⚠️ Error loading audio:", err);
+      afterPlay(loadedSound);
+    }, () => {
+      console.error("Failed to load audio");
+      switching = false;
     });
   }
 
-  // Update colors and UI
-  let song = songsData[i];
-  baseColor = brightenColor(song.base || [0, 255, 255], isMobile ? 100 : 60);
-  accentColor = brightenColor(song.accent || [0, 255, 180], isMobile ? 120 : 80);
-  pulseColor = song.pulse || [255, 255, 255];
-  updateSongTitle(i);
+  // Re-activate context if suspended
+  if (getAudioContext().state !== 'running') {
+    getAudioContext().resume();
+  }
 }
 
 function brightenColor(color, minBrightness = 80) {
@@ -377,6 +395,5 @@ function updateSongTitle(i) {
     titleEl.innerText = `Currently Playing: ${songsData[i].title || "Untitled"}`;
   }
 }
-
 
 
