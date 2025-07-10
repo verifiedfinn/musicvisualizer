@@ -9,7 +9,7 @@ let loadingProgress = 0;
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 function preload() {
-  songsData = loadJSON('songs.json');
+  songsData = loadJSON('');
 }
 
 function setup() {
