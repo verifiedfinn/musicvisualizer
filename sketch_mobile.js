@@ -92,6 +92,12 @@ function hideLoadingOverlay() {
 
 function loadAllSongs() {
   songsData = Array.isArray(songsData) ? songsData : Object.values(songsData);
+
+  //  Filter out the podcast for mobile
+  if (isMobile) {
+    songsData = songsData.filter(song => !(song.title && song.title.toLowerCase().includes("podcast")));
+  }
+
   setupUI();
   populateThumbnails();
   started = true;
