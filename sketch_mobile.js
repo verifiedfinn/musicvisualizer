@@ -27,7 +27,7 @@ function setup() {
 }
 
 function showStartOverlay() {
-  let overlay = createDiv("Tap to Start Visualizer");
+  let overlay = createDiv("Tap to Start/Play/Pause");
   overlay.id("startOverlay");
 
   Object.assign(overlay.elt.style, {
