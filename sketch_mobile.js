@@ -163,10 +163,28 @@ function draw() {
     ellipse(x, y, baseRadius * 1.5 + sin(time * 2 + i) * 5);
   }
 
-  // 🧶 Dual-layer Celtic braid
   for (let j = 0; j < 2; j++) {
-    strokeWeight(1);
-    stroke(baseColor[0], baseColor[1], baseColor[2], 60);
+  strokeWeight(2.5);
+  let [r, g, b] = brightenColor(baseColor, 60);
+  stroke(r, g, b, 30);  // subtle blurred echo
+  noFill();
+  beginShape();
+  for (let i = 0; i <= detail; i++) {
+    let angle = map(i, 0, detail, 0, TWO_PI);
+    let mod = sin(angle * 4 + time * 2 + j * PI / 4) * 10;
+    let r = baseRadius + mod;
+    let x = r * cos(angle);
+    let y = r * sin(angle);
+    curveVertex(x, y);
+  }
+  endShape(CLOSE);
+}
+
+  // 🧶 Dual-layer Celtic braid
+for (let j = 0; j < 2; j++) {
+  strokeWeight(1);
+  let [r, g, b] = brightenColor(baseColor, isMobile ? 90 : 50);  // gentle boost if too dark
+  stroke(r, g, b, 80);  // more visible alpha
     noFill();
     beginShape();
     for (let i = 0; i <= detail; i++) {
@@ -203,7 +221,12 @@ function draw() {
     let rotation = time * 0.15 * (i + 1);
 
     strokeWeight(weight);
-    stroke(accentColor[0], accentColor[1], accentColor[2], alpha);
+    stroke(
+  lerp(accentColor[0], pulseColor[0], 0.2),
+  lerp(accentColor[1], pulseColor[1], 0.2),
+  lerp(accentColor[2], pulseColor[2], 0.2),
+  alpha
+);
     noFill();
     beginShape();
     for (let p of layer) {
@@ -228,7 +251,7 @@ function draw() {
 
   // 💡 Glowing core
   noStroke();
-  fill(pulseColor[0], pulseColor[1], pulseColor[2], 60);
+  fill(pulseColor[0], pulseColor[1], pulseColor[2], 120); // brighter glow
   ellipse(0, 0, pulse * 0.4);
 }
 
@@ -361,3 +384,4 @@ function updateSongTitle(i) {
     titleEl.innerText = `Currently Playing: ${songsData[i].title || "Untitled"}`;
   }
 }
+
