@@ -80,6 +80,20 @@ function hideLoadingOverlay() {
   }
 }
 
+function afterPlay(snd) {
+  if (getAudioContext().state !== 'running') {
+    getAudioContext().resume();
+  }
+  if (snd) {
+    snd.setVolume(0.8); // ensure audible
+    snd.loop();
+    fft.setInput(snd);
+    updateSongTitle(currentSongIndex);
+    hideLoadingOverlay(); // ✅ Only hide when ready
+  }
+  switching = false;
+}
+
 function loadAllSongs() {
   songsData = Array.isArray(songsData) ? songsData : Object.values(songsData);
   setupUI();
@@ -87,7 +101,12 @@ function loadAllSongs() {
   started = true;
   let songData = songsData[0];
 loadSound(songData.audio, (loadedSound) => {
-  soundFiles[0] = loadedSound;
+  loadedSound.setVolume(0.8); // ensure volume is set
+  soundFiles[currentSongIndex] = loadedSound; // use currentSongIndex instead of i
+  afterPlay(loadedSound);
+}, () => {
+  console.error("Failed to load audio");
+  switching = false;
 });
 }
 
@@ -103,39 +122,40 @@ function touchStarted() {
 
   let sound = soundFiles[currentSongIndex];
   if (!sound) {
-    console.warn("⚠️ Tried to play but no song is loaded yet.");
+    console.warn("Tried to play but no song is loaded yet.");
     return;
   }
 
-if (sound && typeof sound.isPlaying === "function") {
-  if (sound.isPlaying()) {
-    sound.pause();
-    document.getElementById("playPauseBtn").innerText = "▶";
-  } else {
-    sound.play();
-    document.getElementById("playPauseBtn").innerText = "\u23F8";
-  }
-}
+  getAudioContext().resume().then(() => {
+    if (sound.isPlaying()) {
+      sound.pause();
+      document.getElementById("playPauseBtn").innerText = "▶";
+    } else {
+      sound.play();
+      document.getElementById("playPauseBtn").innerText = "\u23F8";
+    }
+  });
 }
 
 let switching = false;
 
 function playSong(i) {
-if (switching || i === currentSongIndex) return;
-switching = true;
-getAudioContext().resume();
-showSongLoadingMsg();
+  if (switching || i === currentSongIndex) return;
+  switching = true;
+  getAudioContext().resume();
+  showSongLoadingMsg();
 
-function normalizeColor(input) {
-  if (Array.isArray(input)) return input;
-  if (typeof input === 'string' && input.startsWith('#')) return hexToRGB(input);
-  return [255, 255, 255]; // default fallback
-}
+  const songData = songsData[i];
 
-const songData = songsData[i];
-baseColor = brightenColor(normalizeColor(songData.base), 80);
-accentColor = brightenColor(normalizeColor(songData.accent), 80);
-pulseColor = brightenColor(normalizeColor(songData.pulse), 100);
+  function normalizeColor(input) {
+    if (Array.isArray(input)) return input;
+    if (typeof input === 'string' && input.startsWith('#')) return hexToRGB(input);
+    return [255, 255, 255];
+  }
+
+  baseColor = brightenColor(normalizeColor(songData.base), 80);
+  accentColor = brightenColor(normalizeColor(songData.accent), 80);
+  pulseColor = brightenColor(normalizeColor(songData.pulse), 100);
 
   if (soundFiles[currentSongIndex] && soundFiles[currentSongIndex].isPlaying()) {
     soundFiles[currentSongIndex].stop();
@@ -143,32 +163,31 @@ pulseColor = brightenColor(normalizeColor(songData.pulse), 100);
 
   currentSongIndex = i;
 
-function afterPlay(snd) {
-  if (getAudioContext().state !== 'running') {
-    getAudioContext().resume();
-  } 
+  const afterPlay = (snd) => {
+    if (getAudioContext().state !== 'running') {
+      getAudioContext().resume();
+    }
     if (snd) {
-    snd.loop();
-    fft.setInput(snd);
-    updateSongTitle(currentSongIndex);
-    hideLoadingOverlay();  // ✅ NOW we hide it
-  }
-  switching = false;
-}
+      snd.setVolume(0.8); // ✅ Ensure volume is audible
+      snd.loop();
+      fft.setInput(snd);
+      updateSongTitle(currentSongIndex);
+      hideLoadingOverlay();
+    }
+    switching = false;
+  };
 
   if (soundFiles[i]) {
     afterPlay(soundFiles[i]);
   } else {
-    loadSound(songData.audio, (loadedSound) => {
+    loadSound(songData.audio, function (loadedSound) {
       soundFiles[i] = loadedSound;
-      afterPlay(loadedSound);
-    }, () => {
+      afterPlay(loadedSound); // ✅ This works now — afterPlay is defined above
+    }, function () {
       console.error("Failed to load audio");
       switching = false;
     });
   }
-
-
 }
 
 function brightenColor(color, minBrightness = 80) {
@@ -442,8 +461,6 @@ function updateSongTitle(i) {
 function showSongLoadingMsg() {
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
-}
-
 }
 
 
