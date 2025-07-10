@@ -115,7 +115,7 @@ function touchStarted(event) {
       document.getElementById("playPauseBtn").innerText = "▶";
     } else {
       sound.play();
-      document.getElementById("playPauseBtn").innerText = "\u23F8";
+      document.getElementById("playPauseBtn").innerText = "||";
     }
   }
 }
