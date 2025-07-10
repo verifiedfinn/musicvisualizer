@@ -59,6 +59,7 @@ function showStartOverlay() {
 }
 
 function startApp() {
+  setupUI();
   getAudioContext().resume();  // Ensure context resumes after interaction
   userStartAudio();            // Unlock audio on iOS
 
@@ -514,4 +515,5 @@ function showSongLoadingMsg() {
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
 }
+
 
