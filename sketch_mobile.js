@@ -9,7 +9,7 @@ let loadingProgress = 0;
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 function preload() {
-  songsData = loadJSON('');
+  songsData = loadJSON('songs.json');
 }
 
 function setup() {
@@ -57,34 +57,14 @@ function hideLoadingOverlay() {
 }
 
 function loadAllSongs() {
+  // We only need the data, not the audio files yet
   songsData = Array.isArray(songsData) ? songsData : Object.values(songsData);
-  let loaded = 0;
-  let total = songsData.length;
-
-  songsData.forEach((song, i) => {
-    let s = loadSound(song.audio, () => {
-      loaded++;
-      loadingProgress = loaded / total;
-
-      const loadingBar = document.getElementById("loading-bar");
-      const loadingText = document.getElementById("loading-text");
-
-      if (loadingBar) loadingBar.style.width = `${loadingProgress * 100}%`;
-      if (loadingText) loadingText.innerText = `Loading… ${Math.floor(loadingProgress * 100)}%`;
-
-      if (loaded === total) {
-        setTimeout(() => {
-          hideLoadingOverlay();
-          setupUI();
-          populateThumbnails();
-          playSong(0);     // ✅ moved here
-          started = true;  // ✅ also set started here
-        }, 300);
-      }
-    });
-    soundFiles.push(s);
-  });
+  hideLoadingOverlay();
+  setupUI();
+  populateThumbnails();
+  started = true;
 }
+
 
 let swirlLayers = [];
 
@@ -106,31 +86,31 @@ function touchStarted() {
 }
 
 function playSong(i) {
-  if (currentSongIndex !== -1 && soundFiles[currentSongIndex]?.isPlaying()) {
+  if (soundFiles[currentSongIndex]?.isPlaying()) {
     soundFiles[currentSongIndex].stop();
   }
+
   currentSongIndex = i;
+
   if (soundFiles[i]) {
-  soundFiles[i].loop();
-  fft.setInput(soundFiles[i]);
-} else {
-  loadSound(songsData[i].audio, (loadedSound) => {
-    if (soundFiles[currentSongIndex]) {
-      soundFiles[currentSongIndex].stop();
-    }
+    soundFiles[i].loop();
+    fft.setInput(soundFiles[i]);
+  } else {
+    // Lazy load
+    loadSound(songsData[i].audio, (loadedSound) => {
+      soundFiles[i] = loadedSound;
+      loadedSound.loop();
+      fft.setInput(loadedSound);
+    }, (err) => {
+      console.error("⚠️ Error loading audio:", err);
+    });
+  }
 
-    soundFiles[i] = loadedSound;
-    loadedSound.loop();
-    fft.setInput(loadedSound);
-  });
-}
-  fft.setInput(soundFiles[i]);
-
-  // Optional: Theme from JSON
+  // Update colors and UI
   let song = songsData[i];
-baseColor = brightenColor(song.base || [0, 255, 255], isMobile ? 100 : 60);
-accentColor = brightenColor(song.accent || [0, 255, 180], isMobile ? 120 : 80);
-pulseColor = song.pulse || [255, 255, 255];
+  baseColor = brightenColor(song.base || [0, 255, 255], isMobile ? 100 : 60);
+  accentColor = brightenColor(song.accent || [0, 255, 180], isMobile ? 120 : 80);
+  pulseColor = song.pulse || [255, 255, 255];
   updateSongTitle(i);
 }
 
@@ -397,5 +377,6 @@ function updateSongTitle(i) {
     titleEl.innerText = `Currently Playing: ${songsData[i].title || "Untitled"}`;
   }
 }
+
 
 
