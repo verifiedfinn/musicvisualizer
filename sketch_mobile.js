@@ -85,10 +85,6 @@ function loadAllSongs() {
   setupUI();
   populateThumbnails();
   started = true;
-  let songData = songsData[0];
-loadSound(songData.audio, (loadedSound) => {
-  soundFiles[0] = loadedSound;
-});
 }
 
 
@@ -121,21 +117,21 @@ if (sound && typeof sound.isPlaying === "function") {
 let switching = false;
 
 function playSong(i) {
-if (switching || i === currentSongIndex) return;
-switching = true;
-getAudioContext().resume();
-showSongLoadingMsg();
+  if (switching || i === currentSongIndex) return;
+  switching = true;
+  getAudioContext().resume();
+  showSongLoadingMsg();
 
-function normalizeColor(input) {
-  if (Array.isArray(input)) return input;
-  if (typeof input === 'string' && input.startsWith('#')) return hexToRGB(input);
-  return [255, 255, 255]; // default fallback
-}
+  function normalizeColor(input) {
+    if (Array.isArray(input)) return input;
+    if (typeof input === 'string' && input.startsWith('#')) return hexToRGB(input);
+    return [255, 255, 255]; // default fallback
+  }
 
-const songData = songsData[i];
-baseColor = brightenColor(normalizeColor(songData.base), 80);
-accentColor = brightenColor(normalizeColor(songData.accent), 80);
-pulseColor = brightenColor(normalizeColor(songData.pulse), 100);
+  const songData = songsData[i];
+  baseColor = brightenColor(normalizeColor(songData.base), 80);
+  accentColor = brightenColor(normalizeColor(songData.accent), 80);
+  pulseColor = brightenColor(normalizeColor(songData.pulse), 100);
 
   if (soundFiles[currentSongIndex] && soundFiles[currentSongIndex].isPlaying()) {
     soundFiles[currentSongIndex].stop();
@@ -143,33 +139,31 @@ pulseColor = brightenColor(normalizeColor(songData.pulse), 100);
 
   currentSongIndex = i;
 
-function afterPlay(snd) {
-  if (getAudioContext().state !== 'running') {
-    getAudioContext().resume();
-    snd.loop();
-  } 
-    if (snd) {
-    snd.loop();
-    fft.setInput(snd);
-    updateSongTitle(currentSongIndex);
-    hideLoadingOverlay();  // ✅ NOW we hide it
-  }
-  switching = false;
-}
-
   if (soundFiles[i]) {
     afterPlay(soundFiles[i]);
   } else {
     loadSound(songData.audio, (loadedSound) => {
       soundFiles[i] = loadedSound;
       afterPlay(loadedSound);
-    }, () => {
-      console.error("Failed to load audio");
-      switching = false;
     });
   }
+}
 
+function afterPlay(snd) {
+  if (!snd || !snd.isLoaded()) {
+    console.warn("Sound not ready yet.");
+    return;
+  }
 
+  if (getAudioContext().state !== 'running') {
+    getAudioContext().resume();
+  }
+
+  snd.loop();
+  fft.setInput(snd);
+  updateSongTitle(currentSongIndex);
+  hideLoadingOverlay();
+  switching = false;
 }
 
 function brightenColor(color, minBrightness = 80) {
@@ -444,6 +438,7 @@ function showSongLoadingMsg() {
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
 }
+
 
 
 
