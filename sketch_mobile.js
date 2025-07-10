@@ -313,17 +313,16 @@ function setupUI() {
   document.getElementById("ui-panel").style.display = "flex";
   document.getElementById("controls").style.display = "flex";
 
-  document.getElementById("playPauseBtn").onclick = () => {
-    if (!started) return;
-    let sound = soundFiles[currentSongIndex];
-    if (sound.isPlaying()) {
-      sound.pause();
-      document.getElementById("playPauseBtn").innerText = "▶";
-    } else {
-      sound.play();
-      document.getElementById("playPauseBtn").innerText = "\u23F8";
-    }
-  };
+// Remove onclick behavior entirely:
+document.getElementById("playPauseBtn").onclick = null;
+
+// Just update status text when song plays/pauses
+setInterval(() => {
+  if (!started || !soundFiles[currentSongIndex]) return;
+  let btn = document.getElementById("playPauseBtn");
+  let isPlaying = soundFiles[currentSongIndex].isPlaying();
+  btn.innerText = isPlaying ? "\u23F8" : "▶"; // pause or play symbol
+}, 300);
 
   document.getElementById("replayBtn").onclick = () => {
     if (!started) return;
@@ -336,9 +335,9 @@ function setupUI() {
     setVolume(v > 0 ? 0 : 0.8);
   };
 
-  document.getElementById("volumeSlider").oninput = (e) => {
-    setVolume(e.target.value);
-  };
+ // document.getElementById("volumeSlider").oninput = (e) => {
+ //   setVolume(e.target.value);
+ // };
 
   document.getElementById("scrubber").oninput = (e) => {
     if (started) {
@@ -450,6 +449,7 @@ function showSongLoadingMsg() {
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
 }
+
 
 
 
