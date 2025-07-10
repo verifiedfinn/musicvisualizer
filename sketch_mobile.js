@@ -115,10 +115,22 @@ function playSong(i) {
 
   // Optional: Theme from JSON
   let song = songsData[i];
-  baseColor = song.base || [0, 255, 255];
-  accentColor = song.accent || [0, 255, 180];
-  pulseColor = song.pulse || [255, 255, 255];
+baseColor = brightenColor(song.base || [0, 255, 255], isMobile ? 100 : 60);
+accentColor = brightenColor(song.accent || [0, 255, 180], isMobile ? 120 : 80);
+pulseColor = song.pulse || [255, 255, 255];
   updateSongTitle(i);
+}
+
+function brightenColor(color, minBrightness = 80) {
+  let [r, g, b] = color;
+  let brightness = (r + g + b) / 3;
+  if (brightness < minBrightness) {
+    let boost = minBrightness / brightness;
+    r = min(255, r * boost);
+    g = min(255, g * boost);
+    b = min(255, b * boost);
+  }
+  return [r, g, b];
 }
 
 function draw() {
