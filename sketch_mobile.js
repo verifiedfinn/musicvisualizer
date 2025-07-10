@@ -110,7 +110,20 @@ function playSong(i) {
     soundFiles[currentSongIndex].stop();
   }
   currentSongIndex = i;
+  if (soundFiles[i]) {
   soundFiles[i].loop();
+  fft.setInput(soundFiles[i]);
+} else {
+  loadSound(songsData[i].audio, (loadedSound) => {
+    if (soundFiles[currentSongIndex]) {
+      soundFiles[currentSongIndex].stop();
+    }
+
+    soundFiles[i] = loadedSound;
+    loadedSound.loop();
+    fft.setInput(loadedSound);
+  });
+}
   fft.setInput(soundFiles[i]);
 
   // Optional: Theme from JSON
@@ -384,4 +397,5 @@ function updateSongTitle(i) {
     titleEl.innerText = `Currently Playing: ${songsData[i].title || "Untitled"}`;
   }
 }
+
 
