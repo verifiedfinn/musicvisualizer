@@ -19,6 +19,7 @@ function hexToRGB(hex) {
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
+  canvas.position(0, -30); // move the sketch up
   angleMode(RADIANS);
   colorMode(RGB);
   fft = new p5.FFT();
@@ -464,6 +465,7 @@ function showSongLoadingMsg() {
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
 }
+
 
 
 
