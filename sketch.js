@@ -400,8 +400,3 @@ function updateSongTitle(i) {
     titleEl.style.display = 'block'; // show it when song starts
   }
 }
-
-
-
-
-

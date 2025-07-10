@@ -17,6 +17,15 @@ function hexToRGB(hex) {
   return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
 }
 
+function isAudioPlaying(sound) {
+  if (!sound) return false;
+  if (typeof sound.isPlaying === "function") {
+    return sound.isPlaying(); // p5.SoundFile
+  } else {
+    return !sound.paused && !sound.ended; // HTMLAudioElement (createAudio)
+  }
+}
+
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   canvas.position(0, -60); // move the sketch up
@@ -131,6 +140,9 @@ if (
 let switching = false;
 
 function playSong(i) {
+  // Hide iOS warning after first playback
+const iosWarning = document.getElementById("ios-warning");
+if (iosWarning) iosWarning.style.display = "none";
   if (switching || i === currentSongIndex) return;
   switching = true;
   getAudioContext().resume();
@@ -147,24 +159,27 @@ function playSong(i) {
   accentColor = brightenColor(normalizeColor(songData.accent), 80);
   pulseColor = brightenColor(normalizeColor(songData.pulse), 100);
 
-  if (soundFiles[currentSongIndex] && soundFiles[currentSongIndex].isPlaying()) {
-    soundFiles[currentSongIndex].stop();
-  }
+if (soundFiles[currentSongIndex] && isAudioPlaying(soundFiles[currentSongIndex])) {
+  soundFiles[currentSongIndex].stop();
+}
 
   currentSongIndex = i;
 
   if (soundFiles[i]) {
     afterPlay(soundFiles[i]);
   } else {
-    loadSound(songData.audio, (loadedSound) => {
-      soundFiles[i] = loadedSound;
-      afterPlay(loadedSound);
-    });
+let audio = createAudio(songData.audio);
+soundFiles[i] = audio;
+
+audio.elt.addEventListener("canplaythrough", () => {
+  audio.loop();
+  afterPlay(audio);
+}, { once: true });
   }
 }
 
 function afterPlay(snd) {
-  if (!snd || !snd.isLoaded()) {
+  if (!snd || (snd instanceof p5.SoundFile && !snd.isLoaded())) {
     console.warn("Sound not ready yet.");
     return;
   }
@@ -323,6 +338,16 @@ for (let j = 0; j < 2; j++) {
 
 
 function setupUI() {
+  function isiOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+// Show warning if on iOS
+window.addEventListener("load", () => {
+  if (isiOS()) {
+    document.getElementById("ios-warning").style.display = "block";
+  }
+});
   document.getElementById("ui-panel").style.display = "flex";
   document.getElementById("controls").style.display = "flex";
 
@@ -332,14 +357,20 @@ playPauseBtn.onclick = () => {
   const sound = soundFiles[currentSongIndex];
   if (!sound) return;
 
-  if (sound.isPlaying()) {
-    sound.pause();
+  const isHTMLAudio = sound.elt && sound.elt.tagName === "AUDIO";
+  const isPlaying = isHTMLAudio
+    ? !sound.elt.paused && !sound.elt.ended
+    : sound.isPlaying();
+
+  if (isPlaying) {
+    isHTMLAudio ? sound.elt.pause() : sound.pause();
     playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
   } else {
-    sound.play();
+    isHTMLAudio ? sound.elt.play() : sound.play();
     playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
   }
 };
+
   document.getElementById("replayBtn").onclick = () => {
     if (!started) return;
     soundFiles[currentSongIndex].stop();
@@ -355,13 +386,20 @@ playPauseBtn.onclick = () => {
  //   setVolume(e.target.value);
  // };
 
-  document.getElementById("scrubber").oninput = (e) => {
-    if (started) {
-      let val = e.target.value;
-      let duration = soundFiles[currentSongIndex].duration();
-      soundFiles[currentSongIndex].jump(duration * val);
-    }
-  };
+document.getElementById("scrubber").oninput = (e) => {
+  const sound = soundFiles[currentSongIndex];
+  if (!started || !sound) return;
+
+  const isHTMLAudio = sound.elt && sound.elt.tagName === "AUDIO";
+  const duration = isHTMLAudio ? sound.elt.duration : sound.duration();
+  const jumpTo = duration * e.target.value;
+
+  if (isHTMLAudio) {
+    sound.elt.currentTime = jumpTo;
+  } else {
+    sound.jump(jumpTo);
+  }
+};
 
   setInterval(updateTimeDisplay, 500);
 
@@ -372,13 +410,17 @@ playPauseBtn.onclick = () => {
 }
 
 function updateTimeDisplay() {
-const sound = soundFiles[currentSongIndex];
-if (!started || !sound || typeof sound.currentTime !== "function" || !sound.isLoaded()) return;
+  const sound = soundFiles[currentSongIndex];
+  if (!started || !sound) return;
 
-  const time = sound.currentTime();
-  const duration = sound.duration();
-  document.getElementById("scrubber").value = time / duration;
-  document.getElementById("time-display").innerText = formatTime(time) + " / " + formatTime(duration);
+  const isHTMLAudio = sound.elt && sound.elt.tagName === "AUDIO";
+  const current = isHTMLAudio ? sound.elt.currentTime : sound.currentTime();
+  const duration = isHTMLAudio ? sound.elt.duration : sound.duration();
+
+  if (isNaN(current) || isNaN(duration)) return;
+
+  document.getElementById("scrubber").value = current / duration;
+  document.getElementById("time-display").innerText = formatTime(current) + " / " + formatTime(duration);
 }
 
 function formatTime(t) {
@@ -457,7 +499,7 @@ function populateThumbnails() {
 function updateSongTitle(i) {
   const titleEl = document.getElementById("song-title");
   if (titleEl && songsData[i]) {
-    titleEl.innerText = `Set Silent off for Speaker Currently Playing: ${songsData[i].title || "Untitled"}`;
+    titleEl.innerText = `Currently Playing: ${songsData[i].title || "Untitled"}`;
   }
 }
 
@@ -465,11 +507,3 @@ function showSongLoadingMsg() {
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
 }
-
-
-
-
-
-
-
-
