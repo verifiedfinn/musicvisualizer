@@ -8,6 +8,15 @@ let loadingProgress = 0;
 
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
+function hexToRGB(hex) {
+  hex = hex.replace(/^#/, '');
+  if (hex.length === 3) {
+    hex = hex.split('').map(c => c + c).join('');
+  }
+  let bigint = parseInt(hex, 16);
+  return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+}
+
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   angleMode(RADIANS);
@@ -20,20 +29,10 @@ function showStartOverlay() {
   let overlay = createDiv("Tap to Start Visualizer");
   overlay.id("startOverlay");
 
-  fetch('songs.json')
-  .then(response => response.json())
-  .then(data => {
-    songsData = data;
-    showLoadingOverlay();
-    userStartAudio();
-    loadAllSongs();
-  });
-
   Object.assign(overlay.elt.style, {
     position: "fixed",
     top: "0", left: "0",
     width: "100%", height: "100%",
-    // background: "#000000cc
     color: "white",
     display: "flex",
     justifyContent: "center",
@@ -45,11 +44,21 @@ function showStartOverlay() {
 
   overlay.mousePressed(() => {
     overlay.remove();
-    showLoadingOverlay();
-    userStartAudio();
-    loadAllSongs();
+    startApp(); // <-- NEW: only start everything once user taps
   });
 }
+
+function startApp() {
+  userStartAudio();  // <- This unlocks audio on iOS
+  fetch('songs.json')
+    .then(response => response.json())
+    .then(data => {
+      songsData = data;
+      loadAllSongs();
+    })
+    .catch(err => console.error("Failed to load songs.json", err));
+}
+
 
 function showLoadingOverlay() {
   const overlay = document.getElementById("loading-overlay");
@@ -62,12 +71,13 @@ function hideLoadingOverlay() {
 }
 
 function loadAllSongs() {
-  // We only need the data, not the audio files yet
   songsData = Array.isArray(songsData) ? songsData : Object.values(songsData);
-  hideLoadingOverlay();
   setupUI();
   populateThumbnails();
   started = true;
+
+  showLoadingOverlay();
+  playSong(0);  // preload the first song
 }
 
 
@@ -78,15 +88,18 @@ let accentColor = [0, 255, 180];
 let pulseColor = [255, 255, 255];
 
 function touchStarted() {
-  if (!started) return; // don’t force it early
+  if (!started) return; // Visualizer hasn't begun yet
 
   let sound = soundFiles[currentSongIndex];
-  if (sound && sound.isPlaying()) {
+  if (!sound) {
+    console.warn("⚠️ Tried to play but no song is loaded yet.");
+    return;
+  }
+
+  if (sound.isPlaying()) {
     sound.pause();
-  } else if (sound) {
-    sound.play();
   } else {
-    console.warn("No valid song to play.");
+    sound.play();
   }
 }
 
@@ -96,28 +109,37 @@ function playSong(i) {
   if (switching) return;
   switching = true;
 
-  // Stop the currently playing sound
+function normalizeColor(input) {
+  if (Array.isArray(input)) return input;
+  if (typeof input === 'string' && input.startsWith('#')) return hexToRGB(input);
+  return [255, 255, 255]; // default fallback
+}
+
+const songData = songsData[i];
+baseColor = brightenColor(normalizeColor(songData.base), 80);
+accentColor = brightenColor(normalizeColor(songData.accent), 80);
+pulseColor = brightenColor(normalizeColor(songData.pulse), 100);
+
   if (soundFiles[currentSongIndex] && soundFiles[currentSongIndex].isPlaying()) {
     soundFiles[currentSongIndex].stop();
   }
 
-  // Set new index
   currentSongIndex = i;
-  
 
-  function afterPlay(snd) {
-    if (snd) {
-      snd.loop();
-      fft.setInput(snd);
-      updateSongTitle(i);
-    }
-    switching = false;
+function afterPlay(snd) {
+  if (snd) {
+    snd.loop();
+    fft.setInput(snd);
+    updateSongTitle(currentSongIndex);
+    hideLoadingOverlay();  // ✅ NOW we hide it
   }
+  switching = false;
+}
 
   if (soundFiles[i]) {
     afterPlay(soundFiles[i]);
   } else {
-    loadSound(songsData[i].audio, (loadedSound) => {
+    loadSound(songData.audio, (loadedSound) => {
       soundFiles[i] = loadedSound;
       afterPlay(loadedSound);
     }, () => {
@@ -126,7 +148,6 @@ function playSong(i) {
     });
   }
 
-  // Re-activate context if suspended
   if (getAudioContext().state !== 'running') {
     getAudioContext().resume();
   }
@@ -135,11 +156,11 @@ function playSong(i) {
 function brightenColor(color, minBrightness = 80) {
   let [r, g, b] = color;
   let brightness = (r + g + b) / 3;
-  if (brightness < minBrightness) {
-    let boost = minBrightness / brightness;
-    r = min(255, r * boost);
-    g = min(255, g * boost);
-    b = min(255, b * boost);
+  if (brightness < minBrightness && brightness > 0) { //tweak later as this had a cool glow affect on the rings
+    let factor = minBrightness / brightness;
+    r = constrain(r * factor*2, 0, 255);
+    g = constrain(g * factor*2, 0, 255);
+    b = constrain(b * factor*2, 0, 255);
   }
   return [r, g, b];
 }
@@ -311,9 +332,11 @@ function setupUI() {
 }
 
 function updateTimeDisplay() {
-  if (!started) return;
-  const time = soundFiles[currentSongIndex].currentTime();
-  const duration = soundFiles[currentSongIndex].duration();
+const sound = soundFiles[currentSongIndex];
+if (!started || !sound || typeof sound.currentTime !== "function" || !sound.isLoaded()) return;
+
+  const time = sound.currentTime();
+  const duration = sound.duration();
   document.getElementById("scrubber").value = time / duration;
   document.getElementById("time-display").innerText = formatTime(time) + " / " + formatTime(duration);
 }
