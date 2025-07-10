@@ -70,7 +70,14 @@ function showLoadingOverlay() {
 
 function hideLoadingOverlay() {
   const overlay = document.getElementById("loading-overlay");
-  if (overlay) overlay.style.display = "none";
+  if (!overlay) return;
+
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile) {
+    overlay.remove(); // 🔥 remove completely on mobile
+  } else {
+    overlay.style.display = "none"; // just hide on desktop
+  }
 }
 
 function loadAllSongs() {
@@ -430,6 +437,7 @@ function showSongLoadingMsg() {
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
 }
+
 
 }
 
