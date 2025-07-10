@@ -397,7 +397,7 @@ function updateSongTitle(i) {
   const titleEl = document.getElementById("song-title");
   if (titleEl && songsData[i]) {
     titleEl.innerText = `Current Song: ${songsData[i].title || "Untitled"}`;
-    titleEl.style.display = 'block'; // ← show it when song starts
+    titleEl.style.display = 'block'; // show it when song starts
   }
 }
 
