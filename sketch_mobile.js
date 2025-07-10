@@ -180,6 +180,7 @@ soundFiles[i] = audio;
 audio.elt.addEventListener("canplaythrough", () => {
   audio.loop();
   afterPlay(audio);
+  audio.elt.play();
 }, { once: true });
   }
 }
