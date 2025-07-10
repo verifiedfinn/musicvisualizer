@@ -153,6 +153,7 @@ if (iosWarning) iosWarning.style.display = "none";
   if (switching || i === currentSongIndex) return;
   switching = true;
   getAudioContext().resume();
+   userStartAudio();
   showSongLoadingMsg();
 
   function normalizeColor(input) {
@@ -515,5 +516,3 @@ function showSongLoadingMsg() {
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
 }
-
-
