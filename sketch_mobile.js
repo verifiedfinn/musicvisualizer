@@ -107,11 +107,15 @@ function touchStarted() {
     return;
   }
 
+if (sound && typeof sound.isPlaying === "function") {
   if (sound.isPlaying()) {
     sound.pause();
+    document.getElementById("playPauseBtn").innerText = "▶";
   } else {
     sound.play();
+    document.getElementById("playPauseBtn").innerText = "\u23F8";
   }
+}
 }
 
 let switching = false;
@@ -366,7 +370,9 @@ function getVolume() {
 
 function setVolume(v) {
   if (!started) return;
+  if (soundFiles[currentSongIndex] && typeof soundFiles[currentSongIndex].setVolume === "function") {
   soundFiles[currentSongIndex].setVolume(v);
+}
   document.getElementById("volumeSlider").value = v;
   document.getElementById("muteBtn").innerHTML = v > 0
     ? '<i class="fas fa-volume-up"></i>'
@@ -437,7 +443,6 @@ function showSongLoadingMsg() {
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
 }
-
 
 }
 
