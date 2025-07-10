@@ -99,8 +99,13 @@ function touchStarted(event) {
 
   // Check if touch target is NOT a button or UI element
   const tag = event.target.tagName.toLowerCase();
-if (event.target.closest("#controls") || event.target.closest(".thumb")) {
-  return; // Ignore touches on controls or thumbnails
+if (
+  event.target.closest("#controls") ||
+  event.target.closest(".thumb") ||
+  event.target.closest("#playPauseBtn") ||
+  event.target.id === "playPauseBtn"
+) {
+  return; // Ignore touches on UI
 }
 
 
@@ -459,6 +464,7 @@ function showSongLoadingMsg() {
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
 }
+
 
 
 
