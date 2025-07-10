@@ -1,6 +1,6 @@
 let songsData;
 let soundFiles = [];
-let currentSongIndex = 0;
+let currentSongIndex = -1;
 let fft;
 let started = false;
 let canvas;
@@ -49,7 +49,11 @@ function showStartOverlay() {
 }
 
 function startApp() {
-  userStartAudio();  // <- This unlocks audio on iOS
+  getAudioContext().resume();  // Ensure context resumes after interaction
+  userStartAudio();            // <- Unlock audio on iOS
+
+  hideLoadingOverlay();        // ✅ HIDE loading here immediately
+
   fetch('songs.json')
     .then(response => response.json())
     .then(data => {
@@ -58,7 +62,6 @@ function startApp() {
     })
     .catch(err => console.error("Failed to load songs.json", err));
 }
-
 
 function showLoadingOverlay() {
   const overlay = document.getElementById("loading-overlay");
@@ -75,9 +78,10 @@ function loadAllSongs() {
   setupUI();
   populateThumbnails();
   started = true;
-
-  showLoadingOverlay();
-  playSong(0);  // preload the first song
+  let songData = songsData[0];
+loadSound(songData.audio, (loadedSound) => {
+  soundFiles[0] = loadedSound;
+});
 }
 
 
@@ -100,15 +104,16 @@ function touchStarted() {
     sound.pause();
   } else {
     sound.play();
-    sound.setVolume(0.8); // force volume each time
   }
 }
 
 let switching = false;
 
 function playSong(i) {
-  if (switching) return;
-  switching = true;
+if (switching || i === currentSongIndex) return;
+switching = true;
+getAudioContext().resume();
+showSongLoadingMsg();
 
 function normalizeColor(input) {
   if (Array.isArray(input)) return input;
@@ -128,7 +133,10 @@ pulseColor = brightenColor(normalizeColor(songData.pulse), 100);
   currentSongIndex = i;
 
 function afterPlay(snd) {
-  if (snd) {
+  if (getAudioContext().state !== 'running') {
+    getAudioContext().resume();
+  } 
+    if (snd) {
     snd.loop();
     fft.setInput(snd);
     updateSongTitle(currentSongIndex);
@@ -149,9 +157,7 @@ function afterPlay(snd) {
     });
   }
 
-  if (getAudioContext().state !== 'running') {
-    getAudioContext().resume();
-  }
+
 }
 
 function brightenColor(color, minBrightness = 80) {
@@ -302,7 +308,7 @@ function setupUI() {
       document.getElementById("playPauseBtn").innerText = "▶";
     } else {
       sound.play();
-      document.getElementById("playPauseBtn").innerText = "⏸";
+      document.getElementById("playPauseBtn").innerText = "\u23F8";
     }
   };
 
@@ -418,6 +424,13 @@ function updateSongTitle(i) {
   if (titleEl && songsData[i]) {
     titleEl.innerText = `Currently Playing: ${songsData[i].title || "Untitled"}`;
   }
+}
+
+function showSongLoadingMsg() {
+  const titleEl = document.getElementById("song-title");
+  if (titleEl) titleEl.innerText = "Loading...";
+}
+
 }
 
 
