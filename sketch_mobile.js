@@ -19,7 +19,7 @@ function hexToRGB(hex) {
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
-  canvas.position(0, -60); // move the sketch up
+  canvas.position(0, -80); // move the sketch up
   angleMode(RADIANS);
   colorMode(RGB);
   fft = new p5.FFT();
