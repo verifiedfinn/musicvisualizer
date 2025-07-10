@@ -94,8 +94,14 @@ let baseColor = [0, 255, 255];
 let accentColor = [0, 255, 180];
 let pulseColor = [255, 255, 255];
 
-function touchStarted() {
-  if (!started) return; // Visualizer hasn't begun yet
+function touchStarted(event) {
+  if (!started) return;
+
+  // Check if touch target is NOT a button or UI element
+  const tag = event.target.tagName.toLowerCase();
+  if (tag === 'button' || tag === 'input' || tag === 'div' || tag === 'img') {
+    return; // Don't interfere with UI
+  }
 
   let sound = soundFiles[currentSongIndex];
   if (!sound) {
@@ -103,16 +109,17 @@ function touchStarted() {
     return;
   }
 
-if (sound && typeof sound.isPlaying === "function") {
-  if (sound.isPlaying()) {
-    sound.pause();
-    document.getElementById("playPauseBtn").innerText = "▶";
-  } else {
-    sound.play();
-    document.getElementById("playPauseBtn").innerText = "\u23F8";
+  if (typeof sound.isPlaying === "function") {
+    if (sound.isPlaying()) {
+      sound.pause();
+      document.getElementById("playPauseBtn").innerText = "▶";
+    } else {
+      sound.play();
+      document.getElementById("playPauseBtn").innerText = "\u23F8";
+    }
   }
 }
-}
+
 
 let switching = false;
 
@@ -342,6 +349,11 @@ function setupUI() {
   };
 
   setInterval(updateTimeDisplay, 500);
+
+    if (isMobile) {
+    document.getElementById("volumeSlider").style.display = "none";
+    document.getElementById("muteBtn").style.marginRight = "0"; // Optional: cleaner spacing
+  }
 }
 
 function updateTimeDisplay() {
@@ -438,6 +450,7 @@ function showSongLoadingMsg() {
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
 }
+
 
 
 
