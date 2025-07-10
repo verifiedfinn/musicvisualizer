@@ -50,9 +50,9 @@ function showStartOverlay() {
 
 function startApp() {
   getAudioContext().resume();  // Ensure context resumes after interaction
-  userStartAudio();            // <- Unlock audio on iOS
+  userStartAudio();            // Unlock audio on iOS
 
-  hideLoadingOverlay();        // ✅ HIDE loading here immediately
+  hideLoadingOverlay();        // HIDE loading here immediately
 
   fetch('songs.json')
     .then(response => response.json())
@@ -74,7 +74,7 @@ function hideLoadingOverlay() {
 
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   if (isMobile) {
-    overlay.remove(); // 🔥 remove completely on mobile
+    overlay.remove(); // remove completely on mobile
   } else {
     overlay.style.display = "none"; // just hide on desktop
   }
@@ -99,9 +99,10 @@ function touchStarted(event) {
 
   // Check if touch target is NOT a button or UI element
   const tag = event.target.tagName.toLowerCase();
-  if (tag === 'button' || tag === 'input' || tag === 'div' || tag === 'img') {
-    return; // Don't interfere with UI
-  }
+if (event.target.closest("#controls") || event.target.closest(".thumb")) {
+  return; // Ignore touches on controls or thumbnails
+}
+
 
   let sound = soundFiles[currentSongIndex];
   if (!sound) {
@@ -171,6 +172,12 @@ function afterPlay(snd) {
   updateSongTitle(currentSongIndex);
   hideLoadingOverlay();
   switching = false;
+
+  // Update play/pause icon properly
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  if (playPauseBtn) {
+    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+  }
 }
 
 function brightenColor(color, minBrightness = 80) {
@@ -204,7 +211,7 @@ function draw() {
   let detail = 180;
   let time = millis() * 0.001;
 
-  // 🔁 Celtic Triquetra-style rings
+  // Celtic Triquetra-style rings
   noFill();
   strokeWeight(1.5);
   for (let i = 0; i < 3; i++) {
@@ -232,7 +239,7 @@ function draw() {
   endShape(CLOSE);
 }
 
-  // 🧶 Dual-layer Celtic braid
+  // Dual-layer Celtic braid
 for (let j = 0; j < 2; j++) {
   strokeWeight(1);
   let [r, g, b] = brightenColor(baseColor, isMobile ? 90 : 50);  // gentle boost if too dark
@@ -250,7 +257,7 @@ for (let j = 0; j < 2; j++) {
     endShape(CLOSE);
   }
 
-  // 🌊 Waveform ring
+  // Waveform ring
   let ring = [];
   for (let i = 0; i < detail; i++) {
     let angle = map(i, 0, detail, 0, TWO_PI);
@@ -289,7 +296,7 @@ for (let j = 0; j < 2; j++) {
     endShape(CLOSE);
   }
 
-  // 🧿 Treble-reactive rune points (floating)
+  // Treble-reactive rune points (floating)
   let runeCount = 6;
   for (let i = 0; i < runeCount; i++) {
     let angle = map(i, 0, runeCount, 0, TWO_PI) + time * 0.5;
@@ -313,19 +320,20 @@ function setupUI() {
   document.getElementById("ui-panel").style.display = "flex";
   document.getElementById("controls").style.display = "flex";
 
-// Remove onclick behavior entirely:
-document.getElementById("playPauseBtn").onclick = null;
+const playPauseBtn = document.getElementById("playPauseBtn");
+playPauseBtn.onclick = () => {
+  if (!started) return;
+  const sound = soundFiles[currentSongIndex];
+  if (!sound) return;
 
-// Just update status text when song plays/pauses
-setInterval(() => {
-  if (!started || !soundFiles[currentSongIndex]) return;
-  let btn = document.getElementById("playPauseBtn");
-  let isPlaying = soundFiles[currentSongIndex].isPlaying();
-  btn.innerHTML = isPlaying
-  ? '<i class="fas fa-pause"></i>'
-  : '<i class="fas fa-play"></i>'; // pause or play symbol
-}, 300);
-
+  if (sound.isPlaying()) {
+    sound.pause();
+    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+  } else {
+    sound.play();
+    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+  }
+};
   document.getElementById("replayBtn").onclick = () => {
     if (!started) return;
     soundFiles[currentSongIndex].stop();
