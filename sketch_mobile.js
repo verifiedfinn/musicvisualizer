@@ -100,6 +100,7 @@ function touchStarted() {
     sound.pause();
   } else {
     sound.play();
+    sound.setVolume(0.8); // force volume each time
   }
 }
 
