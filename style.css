@@ -22,9 +22,11 @@ body {
 .scroll-arrow {
   font-size: 28px;
   color: cyan;
+  background: transparent;
+  border: none;
   cursor: pointer;
-  user-select: none;
-  padding: 0 10px;
+  padding: 6px;
+  z-index: 5;
 }
 
 .thumb, .thumbnail {
@@ -34,7 +36,7 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: transform 0.2s;
-  border: 2px solid cyan;
+  border: 1.25px solid cyan;
 }
 
 .thumb:hover,
@@ -229,3 +231,177 @@ body {
 .song-thumbnails::-webkit-scrollbar {
   height: 8px;
 }
+
+#startOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000; /* Fully opaque */
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  z-index: 9999;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 2px;
+  text-align: center;
+
+  /* Add this to make sure canvas isn’t bleeding through */
+  backdrop-filter: blur(0); /* Optional – useful for transparent overlays */
+  pointer-events: auto;
+}
+
+#startOverlay {
+  background: linear-gradient(120deg, #000010, #001f3f, #000010);
+  background-size: 400% 400%;
+  animation: gradientShift 10s ease infinite;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  letter-spacing: 2px;
+  text-align: center;
+  z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  text-shadow: 0 0 12px #00f6ff;
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.song-title {
+  position: absolute;
+  bottom: 90px; /* Lower on the screen */
+  left: 50%;
+  transform: translateX(-50%);
+  color: cyan;
+  font-size: 13px;
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 5px 12px;
+  border-radius: 6px;
+  z-index: 10;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ---- Responsive Design for Mobile ---- */
+@media (max-width: 768px) {
+  #ui-panel {
+    margin-bottom: 20px; /* lift it up */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+.thumbnail-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  overflow: hidden;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.scroll-arrow {
+  all: unset; /* This resets all browser-default button styles */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: cyan;
+  cursor: pointer;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  top: 70%;
+  transform: translateY(-50%);
+  user-select: none;
+}
+
+#scrollLeft {
+  left: -11px;
+}
+
+#scrollRight {
+  right: -11px;
+}
+
+#thumbnailContainer {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  gap: 0.25rem;
+  flex-grow: 1;
+  padding: 0 6px;
+}
+
+  .thumbnail-container {
+    flex: 0 0 22%;
+    scroll-snap-align: start;
+    text-align: center;
+  }
+
+  .thumb, .thumbnail {
+    width: 60px;
+    height: 60px;
+  }
+
+  .thumbnail-title {
+    font-size: 10px;
+    max-width: 60px;
+    overflow-wrap: break-word;
+    margin-top: 4px;
+  }
+
+  #controls {
+    position: fixed;
+    bottom: 10px;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    width: 95vw;
+    max-width: 360px;
+    box-sizing: border-box;
+  }
+
+  #scrubber,
+  #volumeSlider {
+    width: 100%;
+  }
+
+  #time-display {
+    font-size: 12px;
+  }
+
+  #playPauseBtn, #replayBtn, #muteBtn {
+    font-size: 16px;
+    padding: 6px 12px;
+  }
+}
+
+
