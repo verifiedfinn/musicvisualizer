@@ -457,7 +457,7 @@ function populateThumbnails() {
 function updateSongTitle(i) {
   const titleEl = document.getElementById("song-title");
   if (titleEl && songsData[i]) {
-    titleEl.innerText = `Currently Playing: ${songsData[i].title || "Untitled"}`;
+    titleEl.innerText = `Set Silent off for Speaker Currently Playing: ${songsData[i].title || "Untitled"}`;
   }
 }
 
