@@ -112,10 +112,10 @@ function touchStarted(event) {
   if (typeof sound.isPlaying === "function") {
     if (sound.isPlaying()) {
       sound.pause();
-      document.getElementById("playPauseBtn").innerText = "▶";
+      document.getElementById("playPauseBtn").innerHTML = '<i class="fas fa-play"></i>';
     } else {
       sound.play();
-      document.getElementById("playPauseBtn").innerText = "||";
+      document.getElementById("playPauseBtn").innerHTML = '<i class="fas fa-pause"></i>';
     }
   }
 }
@@ -321,7 +321,9 @@ setInterval(() => {
   if (!started || !soundFiles[currentSongIndex]) return;
   let btn = document.getElementById("playPauseBtn");
   let isPlaying = soundFiles[currentSongIndex].isPlaying();
-  btn.innerText = isPlaying ? "\u23F8" : "▶"; // pause or play symbol
+  btn.innerHTML = isPlaying
+  ? '<i class="fas fa-pause"></i>'
+  : '<i class="fas fa-play"></i>'; // pause or play symbol
 }, 300);
 
   document.getElementById("replayBtn").onclick = () => {
