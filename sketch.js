@@ -63,6 +63,9 @@ function setup() {
 
   loadSongs();
   createSongButtons();
+
+  const titleEl = document.getElementById("song-title");
+if (titleEl) titleEl.style.display = 'none'; // hide initially
 }
 
 function loadSongs() {
@@ -122,6 +125,7 @@ function playSong(i) {
 }
   stopAllSongs();
   currentSongIndex = i;
+  updateSongTitle(i);
   let song = songsData[i];
   sensitivity = song.sensitivity || 1.0;
 
@@ -387,6 +391,14 @@ function windowResized() {
   bufferGraphics.angleMode(RADIANS);
   bufferGraphics.colorMode(RGB, 255);
   bufferGraphics.noStroke();
+}
+
+function updateSongTitle(i) {
+  const titleEl = document.getElementById("song-title");
+  if (titleEl && songsData[i]) {
+    titleEl.innerText = `Current Song: ${songsData[i].title || "Untitled"}`;
+    titleEl.style.display = 'block'; // ← show it when song starts
+  }
 }
 
 
