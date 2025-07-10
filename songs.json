@@ -18,15 +18,6 @@
     "sensitivity": 0.85
   },
   {
-    "title": "UVIC Psychology Podcast",
-    "audio": "https://static.wixstatic.com/mp3/b00180_6cc0ff4957434d21b68d8f2a10aac9c5.mp3",
-    "thumbnail": "https://static.wixstatic.com/media/b00180_b2fc54e4e2ef4e8ead56e1ea9e971b83~mv2.png",
-    "base": [20, 70, 50],
-    "accent": [100, 255, 140],
-    "pulse": [250, 100, 180],
-    "sensitivity": 0.5
-  },
-  {
     "title": "Full Improv",
     "audio": "https://static.wixstatic.com/mp3/b00180_603d6a888923491c9e8ff98c42b2b2da.mp3",
     "thumbnail": "https://static.wixstatic.com/media/b00180_dbd6d0ab8f27425b9bb571acfb274e90~mv2.jpg",
