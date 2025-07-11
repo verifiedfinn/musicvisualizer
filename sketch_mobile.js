@@ -499,6 +499,7 @@ function populateThumbnails() {
     img.src = song.thumbnail;
     img.className = "thumb";
     img.onclick = () => {
+      userStartAudio();
       playSong(i);
     };
 
