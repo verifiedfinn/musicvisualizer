@@ -17,6 +17,15 @@
     "pulse": [255, 240, 120],
     "sensitivity": 0.85
   },
+    {
+    "title": "REDX-Stay",
+    "audio": "https://static.wixstatic.com/mp3/b00180_0ef4319a734341f0918e920ec8cb6b70.mp3",
+    "thumbnail": "https://static.wixstatic.com/media/b00180_4c54bb7a40fc48f6a3897ae96e26bb58~mv2.jpg",
+  "base": [10, 10, 10],         
+  "accent": [150, 0, 0],        
+  "pulse": [0, 0, 0],           
+  "sensitivity": 0.85
+  },
   {
     "title": "UVIC Psychology Podcast",
     "audio": "https://static.wixstatic.com/mp3/b00180_6cc0ff4957434d21b68d8f2a10aac9c5.mp3",
