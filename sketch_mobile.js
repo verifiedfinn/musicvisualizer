@@ -28,6 +28,12 @@ function isAudioPlaying(sound) {
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
+  canvas.mousePressed(() => {
+  if (!started) {
+    userStartAudio();
+    started = true;
+  }
+});
   canvas.position(0, -60); // move the sketch up
   angleMode(RADIANS);
   colorMode(RGB);
@@ -499,7 +505,7 @@ function populateThumbnails() {
     img.src = song.thumbnail;
     img.className = "thumb";
     img.onclick = () => {
-      userStartAudio();
+       userStartAudio();
       playSong(i);
     };
 
@@ -528,6 +534,10 @@ function updateSongTitle(i) {
 }
 
 function showSongLoadingMsg() {
+  const titleEl = document.getElementById("song-title");
+  if (titleEl) titleEl.innerText = "Loading...";
+}
+
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
 }
