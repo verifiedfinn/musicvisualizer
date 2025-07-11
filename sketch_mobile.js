@@ -197,14 +197,25 @@ if (soundFiles[i]) {
   let audio = createAudio(songData.audio);
   soundFiles[i] = audio;
 
-  audio.elt.onloadeddata = () => {
-    try {
-      audio.play(); // No .then, just direct call
-      afterPlay(audio);
-    } catch (err) {
-      console.warn("Autoplay failed:", err);
-    }
-  };
+  // 👇 START loading
+  audio.elt.load(); 
+
+  // 👇 Try playing *immediately* in the gesture event
+  try {
+    audio.play(); // iOS only allows this inside onclick
+    afterPlay(audio);
+  } catch (err) {
+    console.warn("Initial play attempt failed:", err);
+    // As fallback, hook to loadeddata if needed
+    audio.elt.onloadeddata = () => {
+      try {
+        audio.play();
+        afterPlay(audio);
+      } catch (e) {
+        console.warn("Fallback play also failed:", e);
+      }
+    };
+  }
 }
 }
 
@@ -534,10 +545,6 @@ function updateSongTitle(i) {
 }
 
 function showSongLoadingMsg() {
-  const titleEl = document.getElementById("song-title");
-  if (titleEl) titleEl.innerText = "Loading...";
-}
-
   const titleEl = document.getElementById("song-title");
   if (titleEl) titleEl.innerText = "Loading...";
 }
