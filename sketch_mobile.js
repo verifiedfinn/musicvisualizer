@@ -156,6 +156,16 @@ if (iosWarning) iosWarning.style.display = "none";
    userStartAudio();
   showSongLoadingMsg();
 
+  if (currentSongIndex !== -1 && soundFiles[currentSongIndex]) {
+  let currentSound = soundFiles[currentSongIndex];
+  if (typeof currentSound.stop === "function") {
+    currentSound.stop(); // p5.SoundFile
+  } else if (currentSound.elt) {
+    currentSound.elt.pause(); // HTMLAudioElement
+    currentSound.elt.currentTime = 0; // reset to start
+  }
+}
+
   function normalizeColor(input) {
     if (Array.isArray(input)) return input;
     if (typeof input === 'string' && input.startsWith('#')) return hexToRGB(input);
@@ -167,24 +177,29 @@ if (iosWarning) iosWarning.style.display = "none";
   accentColor = brightenColor(normalizeColor(songData.accent), 80);
   pulseColor = brightenColor(normalizeColor(songData.pulse), 100);
 
-if (soundFiles[currentSongIndex] && isAudioPlaying(soundFiles[currentSongIndex])) {
-  soundFiles[currentSongIndex].stop();
-}
-
+if (soundFiles[i]) {
   currentSongIndex = i;
-
-  if (soundFiles[i]) {
-    afterPlay(soundFiles[i]);
-  } else {
-let audio = createAudio(songData.audio);
-soundFiles[i] = audio;
-
-audio.elt.addEventListener("canplaythrough", () => {
-  audio.loop();
-  afterPlay(audio);
-  audio.elt.play();
-}, { once: true });
+  let snd = soundFiles[i];
+  try {
+    snd.play();
+    afterPlay(snd);
+  } catch (err) {
+    console.warn("Play failed:", err);
   }
+} else {
+  currentSongIndex = i;
+  let audio = createAudio(songData.audio);
+  soundFiles[i] = audio;
+
+  audio.elt.onloadeddata = () => {
+    try {
+      audio.play(); // No .then, just direct call
+      afterPlay(audio);
+    } catch (err) {
+      console.warn("Autoplay failed:", err);
+    }
+  };
+}
 }
 
 function afterPlay(snd) {
@@ -197,7 +212,6 @@ function afterPlay(snd) {
     getAudioContext().resume();
   }
 
-  snd.loop();
   fft.setInput(snd);
   updateSongTitle(currentSongIndex);
   hideLoadingOverlay();
@@ -403,11 +417,11 @@ document.getElementById("scrubber").oninput = (e) => {
   const duration = isHTMLAudio ? sound.elt.duration : sound.duration();
   const jumpTo = duration * e.target.value;
 
-  if (isHTMLAudio) {
-    sound.elt.currentTime = jumpTo;
-  } else {
-    sound.jump(jumpTo);
-  }
+if (isHTMLAudio) {
+  sound.elt.currentTime = jumpTo;
+} else if (sound.jump) {
+  sound.jump(jumpTo);
+}
 };
 
   setInterval(updateTimeDisplay, 500);
@@ -422,9 +436,9 @@ function updateTimeDisplay() {
   const sound = soundFiles[currentSongIndex];
   if (!started || !sound) return;
 
-  const isHTMLAudio = sound.elt && sound.elt.tagName === "AUDIO";
-  const current = isHTMLAudio ? sound.elt.currentTime : sound.currentTime();
-  const duration = isHTMLAudio ? sound.elt.duration : sound.duration();
+const isHTMLAudio = sound.elt && sound.elt.tagName === "AUDIO";
+const current = isHTMLAudio ? sound.elt.currentTime : (sound.currentTime ? sound.currentTime() : 0);
+const duration = isHTMLAudio ? sound.elt.duration : (sound.duration ? sound.duration() : 0);
 
   if (isNaN(current) || isNaN(duration)) return;
 
