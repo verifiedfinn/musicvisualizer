@@ -12,9 +12,6 @@ let canvas;
 let colorPalette, currentPalette, targetPalette;
 let paletteLerpAmt = 1.0;
 let sensitivity = 1.0;
-let seeking = false;
-let wasPlayingBeforeSeek = false;
-let manualSeekTime = null;
 let isMobile = /Mobi|Android/i.test(navigator.userAgent);
 
 let scrubber, replayBtn, playPauseBtn, timeDisplay, volumeSlider, muteBtn;
@@ -189,33 +186,35 @@ function setupControls() {
     }
   };
 
-  scrubber.addEventListener('mousedown', () => {
-    if (currentSongIndex >= 0) {
-      wasPlayingBeforeSeek = isPlaying;
-      seeking = true;
-    }
-  });
+scrubber.addEventListener('input', (e) => {
+  if (currentSongIndex < 0) return;
 
-  scrubber.addEventListener('mouseup', () => {
-    if (currentSongIndex >= 0) {
-      const current = soundFiles[currentSongIndex];
-      const dur = current.duration();
-      if (dur > 0) {
-        const newTime = scrubber.value * dur;
-        manualSeekTime = newTime;
-        current.stop();
-        if (wasPlayingBeforeSeek) {
-          current.play(0, 1, muted ? 0 : parseFloat(volumeSlider.value), manualSeekTime);
-          fft.setInput(current);
-          isPlaying = true;
-        } else {
-          isPlaying = false;
-        }
-        seeking = false;
-        updatePlayPauseIcon();
-      }
-    }
-  });
+  let current = soundFiles[currentSongIndex];
+  let dur = current.duration();
+  if (!dur || isNaN(dur)) return;
+
+  const clampedRatio = Math.min(e.target.value, 0.995); // max 99.5%
+  const newTime = clampedRatio * dur;
+  const wasPlaying = current.isPlaying();
+  const volumeBefore = muted ? 0 : parseFloat(volumeSlider.value);
+
+  current.setVolume(0); // temporarily mute
+  current.stop();
+  current.play(0, 1, 0, newTime); // jump silently
+
+  if (!wasPlaying) {
+    setTimeout(() => {
+      current.pause();
+      current.setVolume(volumeBefore); // restore volume after pausing
+    }, 30);
+  } else {
+    current.setVolume(volumeBefore);
+  }
+
+  fft.setInput(current);
+});
+
+
 
   volumeSlider.addEventListener('input', () => {
     if (currentSongIndex >= 0) {
@@ -282,10 +281,14 @@ colorPalette = {
     return;
   }
 
-  let current = soundFiles[currentSongIndex];
-  let curTime = manualSeekTime !== null ? manualSeekTime : current.currentTime();
-  if (!seeking) scrubber.value = curTime / current.duration();
-  timeDisplay.innerHTML = `${formatTime(curTime)} / ${formatTime(current.duration())}`;
+let current = soundFiles[currentSongIndex];
+let curTime = current.currentTime();
+let duration = current.duration();
+
+if (!isNaN(curTime) && !isNaN(duration) && duration > 0) {
+  scrubber.value = curTime / duration;
+  timeDisplay.innerHTML = `${formatTime(curTime)} / ${formatTime(duration)}`;
+}
 
   let spectrum = fft.analyze();
   let bass = fft.getEnergy("bass");
