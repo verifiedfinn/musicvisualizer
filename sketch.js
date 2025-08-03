@@ -12,9 +12,6 @@ let canvas;
 let colorPalette, currentPalette, targetPalette;
 let paletteLerpAmt = 1.0;
 let sensitivity = 1.0;
-let seeking = false;
-let wasPlayingBeforeSeek = false;
-let manualSeekTime = null;
 let isMobile = /Mobi|Android/i.test(navigator.userAgent);
 
 let scrubber, replayBtn, playPauseBtn, timeDisplay, volumeSlider, muteBtn;
@@ -189,41 +186,45 @@ function setupControls() {
     }
   };
 
-  scrubber.addEventListener('mousedown', () => {
-    if (currentSongIndex >= 0) {
-      wasPlayingBeforeSeek = isPlaying;
-      seeking = true;
-    }
-  });
+scrubber.addEventListener('input', (e) => {
+  if (currentSongIndex < 0) return;
 
-scrubber.addEventListener('mouseup', () => {
-  if (currentSongIndex >= 0) {
-    const current = soundFiles[currentSongIndex];
-    const dur = current.duration();
-    if (dur > 0) {
-      const newTime = scrubber.value * dur;
-      try {
-        current.jump(newTime); // 🔁 clean seek
-        fft.setInput(current);
+  const current = soundFiles[currentSongIndex];
+  const dur = current.duration();
+  if (!dur || isNaN(dur)) return;
 
-        // Optional fix: force re-sync for Chrome's currentTime()
-        if (current.isPlaying()) {
-          setTimeout(() => {
-            current.pause();
-            current.play();
-            fft.setInput(current);
-          }, 30);
-        }
+  const clampedRatio = Math.min(e.target.value, 0.995);
+  const newTime = clampedRatio * dur;
 
-      } catch (err) {
-        console.warn("Jump failed:", err);
+  const wasPlaying = current.isPlaying();
+
+  if (current.buffer && current.buffer.duration > 0) {
+    try {
+      current.jump(newTime);
+
+      // Fix: If it was playing, pause+play again to force currentTime() update
+      if (wasPlaying) {
+        setTimeout(() => {
+          current.pause();
+          current.play();
+          fft.setInput(current); // ensure visuals continue
+        }, 30); // small delay to allow jump to complete
       }
 
-      seeking = false;
-      manualSeekTime = null;
+      // Optional immediate feedback in UI
+      setTimeout(() => {
+        const time = current.currentTime();
+        scrubber.value = time / dur;
+        timeDisplay.innerHTML = `${formatTime(time)} / ${formatTime(dur)}`;
+      }, 100);
+
+    } catch (err) {
+      console.warn('Jump failed:', err);
     }
   }
 });
+
+
 
   volumeSlider.addEventListener('input', () => {
     if (currentSongIndex >= 0) {
@@ -290,11 +291,13 @@ colorPalette = {
     return;
   }
 
-  let current = soundFiles[currentSongIndex];
-if (!seeking && current.isPlaying()) {
-  let curTime = current.currentTime();
-  scrubber.value = curTime / current.duration();
-  timeDisplay.innerHTML = `${formatTime(curTime)} / ${formatTime(current.duration())}`;
+let current = soundFiles[currentSongIndex];
+let curTime = current.currentTime();
+let duration = current.duration();
+
+if (!isNaN(curTime) && !isNaN(duration) && duration > 0) {
+  scrubber.value = curTime / duration;
+  timeDisplay.innerHTML = `${formatTime(curTime)} / ${formatTime(duration)}`;
 }
 
   let spectrum = fft.analyze();
@@ -409,5 +412,5 @@ function updateSongTitle(i) {
     titleEl.innerText = `Current Song: ${songsData[i].title || "Untitled"}`;
     titleEl.style.display = 'block'; // show it when song starts
   }
-
 }
+
