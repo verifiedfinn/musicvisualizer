@@ -189,28 +189,22 @@ function setupControls() {
 scrubber.addEventListener('input', (e) => {
   if (currentSongIndex < 0) return;
 
-  let current = soundFiles[currentSongIndex];
-  let dur = current.duration();
+  const current = soundFiles[currentSongIndex];
+  const dur = current.duration();
   if (!dur || isNaN(dur)) return;
 
   const clampedRatio = Math.min(e.target.value, 0.995);
   const newTime = clampedRatio * dur;
-  const wasPlaying = current.isPlaying();
-  const volumeBefore = muted ? 0 : parseFloat(volumeSlider.value);
 
-  current.setVolume(0); // mute while seeking
-  current.jump(newTime);
-
-  if (!wasPlaying) {
-    setTimeout(() => {
-      current.pause();
-      current.setVolume(volumeBefore);
-    }, 50);
-  } else {
-    setTimeout(() => current.setVolume(volumeBefore), 50);
+  // Ensure the sound is loaded and jump safely
+  if (current.buffer && current.buffer.duration > 0) {
+    try {
+      current.jump(newTime);
+      fft.setInput(current);
+    } catch (err) {
+      console.warn('Jump failed:', err);
+    }
   }
-
-  fft.setInput(current);
 });
 
 
