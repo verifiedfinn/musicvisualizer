@@ -196,11 +196,17 @@ scrubber.addEventListener('input', (e) => {
   const clampedRatio = Math.min(e.target.value, 0.995);
   const newTime = clampedRatio * dur;
 
-  // Ensure the sound is loaded and jump safely
   if (current.buffer && current.buffer.duration > 0) {
     try {
       current.jump(newTime);
       fft.setInput(current);
+
+      // Force a delayed refresh of currentTime to "unfreeze" the scrubber
+      setTimeout(() => {
+        const force = current.currentTime(); // triggers internal update
+        scrubber.value = force / dur;
+        timeDisplay.innerHTML = `${formatTime(force)} / ${formatTime(dur)}`;
+      }, 50);
     } catch (err) {
       console.warn('Jump failed:', err);
     }
