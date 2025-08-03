@@ -193,22 +193,21 @@ scrubber.addEventListener('input', (e) => {
   let dur = current.duration();
   if (!dur || isNaN(dur)) return;
 
-  const clampedRatio = Math.min(e.target.value, 0.995); // max 99.5%
+  const clampedRatio = Math.min(e.target.value, 0.995);
   const newTime = clampedRatio * dur;
   const wasPlaying = current.isPlaying();
   const volumeBefore = muted ? 0 : parseFloat(volumeSlider.value);
 
-  current.setVolume(0); // temporarily mute
-  current.stop();
-  current.play(0, 1, 0, newTime); // jump silently
+  current.setVolume(0); // mute while seeking
+  current.jump(newTime);
 
   if (!wasPlaying) {
     setTimeout(() => {
       current.pause();
-      current.setVolume(volumeBefore); // restore volume after pausing
-    }, 30);
+      current.setVolume(volumeBefore);
+    }, 50);
   } else {
-    current.setVolume(volumeBefore);
+    setTimeout(() => current.setVolume(volumeBefore), 50);
   }
 
   fft.setInput(current);
@@ -403,3 +402,4 @@ function updateSongTitle(i) {
     titleEl.style.display = 'block'; // show it when song starts
   }
 }
+
