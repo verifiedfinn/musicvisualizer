@@ -196,26 +196,34 @@ function setupControls() {
     }
   });
 
-  scrubber.addEventListener('mouseup', () => {
-    if (currentSongIndex >= 0) {
-      const current = soundFiles[currentSongIndex];
-      const dur = current.duration();
-      if (dur > 0) {
-        const newTime = scrubber.value * dur;
-        manualSeekTime = newTime;
-        current.stop();
-        if (wasPlayingBeforeSeek) {
-          current.play(0, 1, muted ? 0 : parseFloat(volumeSlider.value), manualSeekTime);
-          fft.setInput(current);
-          isPlaying = true;
-        } else {
-          isPlaying = false;
+scrubber.addEventListener('mouseup', () => {
+  if (currentSongIndex >= 0) {
+    const current = soundFiles[currentSongIndex];
+    const dur = current.duration();
+    if (dur > 0) {
+      const newTime = scrubber.value * dur;
+      try {
+        current.jump(newTime); // 🔁 clean seek
+        fft.setInput(current);
+
+        // Optional fix: force re-sync for Chrome's currentTime()
+        if (current.isPlaying()) {
+          setTimeout(() => {
+            current.pause();
+            current.play();
+            fft.setInput(current);
+          }, 30);
         }
-        seeking = false;
-        updatePlayPauseIcon();
+
+      } catch (err) {
+        console.warn("Jump failed:", err);
       }
+
+      seeking = false;
+      manualSeekTime = null;
     }
-  });
+  }
+});
 
   volumeSlider.addEventListener('input', () => {
     if (currentSongIndex >= 0) {
@@ -283,9 +291,11 @@ colorPalette = {
   }
 
   let current = soundFiles[currentSongIndex];
-  let curTime = manualSeekTime !== null ? manualSeekTime : current.currentTime();
-  if (!seeking) scrubber.value = curTime / current.duration();
+if (!seeking && current.isPlaying()) {
+  let curTime = current.currentTime();
+  scrubber.value = curTime / current.duration();
   timeDisplay.innerHTML = `${formatTime(curTime)} / ${formatTime(current.duration())}`;
+}
 
   let spectrum = fft.analyze();
   let bass = fft.getEnergy("bass");
@@ -399,4 +409,5 @@ function updateSongTitle(i) {
     titleEl.innerText = `Current Song: ${songsData[i].title || "Untitled"}`;
     titleEl.style.display = 'block'; // show it when song starts
   }
+
 }
