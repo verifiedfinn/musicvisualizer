@@ -196,17 +196,28 @@ scrubber.addEventListener('input', (e) => {
   const clampedRatio = Math.min(e.target.value, 0.995);
   const newTime = clampedRatio * dur;
 
+  const wasPlaying = current.isPlaying();
+
   if (current.buffer && current.buffer.duration > 0) {
     try {
       current.jump(newTime);
-      fft.setInput(current);
 
-      // Force a delayed refresh of currentTime to "unfreeze" the scrubber
+      // Fix: If it was playing, pause+play again to force currentTime() update
+      if (wasPlaying) {
+        setTimeout(() => {
+          current.pause();
+          current.play();
+          fft.setInput(current); // ensure visuals continue
+        }, 30); // small delay to allow jump to complete
+      }
+
+      // Optional immediate feedback in UI
       setTimeout(() => {
-        const force = current.currentTime(); // triggers internal update
-        scrubber.value = force / dur;
-        timeDisplay.innerHTML = `${formatTime(force)} / ${formatTime(dur)}`;
-      }, 50);
+        const time = current.currentTime();
+        scrubber.value = time / dur;
+        timeDisplay.innerHTML = `${formatTime(time)} / ${formatTime(dur)}`;
+      }, 100);
+
     } catch (err) {
       console.warn('Jump failed:', err);
     }
