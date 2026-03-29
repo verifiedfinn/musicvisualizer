@@ -13,18 +13,22 @@
     var BASE = "https://raw.githubusercontent.com/verifiedfinn/site-assets/main/cursors/";
     var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
     var ext = isFirefox ? "png" : "cur";
-    var cursors = {
+    window._tronCursors = {
       default:    "url('" + BASE + "cursor_normal."  + ext + "') 0 0, auto",
       pointer:    "url('" + BASE + "cursor_link."    + ext + "') 12 2, pointer",
       text:       "url('" + BASE + "cursor_text."    + ext + "') 16 16, text",
       notAllowed: "url('" + BASE + "cursor_unavail." + ext + "') 0 0, not-allowed"
     };
-    document.documentElement.style.cursor = cursors.default;
+    document.documentElement.style.cursor = window._tronCursors.default;
     document.addEventListener("mouseover", function (e) {
+      if (e.target.tagName && e.target.tagName.toLowerCase() === 'canvas') {
+        e.target.style.cursor = window._tronCursors.default;
+        return;
+      }
       var t   = e.target.closest("a, button, [role='button'], input[type='submit'], input[type='button']");
       var inp = e.target.closest("input:not([type='submit']):not([type='button']), textarea, [contenteditable]");
-      if (t)   { t.style.cursor   = cursors.pointer; return; }
-      if (inp) { inp.style.cursor = cursors.text;    return; }
+      if (t)   { t.style.cursor   = window._tronCursors.pointer; return; }
+      if (inp) { inp.style.cursor = window._tronCursors.text;    return; }
     });
     document.addEventListener("mouseout", function (e) {
       var t   = e.target.closest("a, button, [role='button'], input[type='submit'], input[type='button']");
@@ -50,13 +54,12 @@
           </div>
         </div>
       </div>
-
-<div id="ui-panel">
-<div id="scrollLeft" class="scroll-arrow">❮</div>
-<div id="thumbnailContainer" class="song-thumbnails"></div>
-<div id="scrollRight" class="scroll-arrow">❯</div>
-</div>
-<div id="song-title" class="song-title">Click a song to play</div>
+      <div id="ui-panel">
+        <div id="scrollLeft" class="scroll-arrow">❮</div>
+        <div id="thumbnailContainer" class="song-thumbnails"></div>
+        <div id="scrollRight" class="scroll-arrow">❯</div>
+      </div>
+      <div id="song-title" class="song-title">Click a song to play</div>
       <div id="controls">
         <button id="playPauseBtn">▶</button>
         <button id="replayBtn">⟲</button>
@@ -70,7 +73,6 @@
   function isMobileDevice() {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   }
-
   const script = document.createElement('script');
   script.src = isMobileDevice() ? 'sketch_mobile.js' : 'sketch.js';
   document.body.appendChild(script);
