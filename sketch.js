@@ -36,6 +36,7 @@ function setup() {
   canvas.style('position', 'absolute');
   canvas.style('top', '0');
   canvas.style('left', '0');
+  if (window._tronCursors) canvas.elt.style.cursor = window._tronCursors.default;
 
   angleMode(RADIANS);
   colorMode(RGB, 255);
