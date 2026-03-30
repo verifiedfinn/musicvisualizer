@@ -6,6 +6,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
+    <script>
+(function () {
+  try {
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+    var BASE = "https://raw.githubusercontent.com/verifiedfinn/site-assets/main/cursors/";
+    var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+    var ext = isFirefox ? "png" : "cur";
+    window._tronCursors = {
+      default:    "url('" + BASE + "cursor_normal."  + ext + "') 0 0, auto",
+      pointer:    "url('" + BASE + "cursor_link."    + ext + "') 12 2, pointer",
+      text:       "url('" + BASE + "cursor_text."    + ext + "') 16 16, text",
+      notAllowed: "url('" + BASE + "cursor_unavail." + ext + "') 0 0, not-allowed"
+    };
+    document.documentElement.style.cursor = window._tronCursors.default;
+    var styleTag = document.createElement('style');
+    styleTag.textContent = 'canvas { cursor: ' + window._tronCursors.default + ' !important; }';
+    document.head.appendChild(styleTag);
+    var observer = new MutationObserver(function() {
+      var canvases = document.querySelectorAll('canvas');
+      canvases.forEach(function(c) {
+        if (c.style.cursor !== window._tronCursors.default) {
+          c.style.setProperty('cursor', window._tronCursors.default, 'important');
+        }
+      });
+    });
+    observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['style'] });
+    document.addEventListener("mouseover", function (e) {
+      if (e.target.tagName && e.target.tagName.toLowerCase() === 'canvas') {
+        e.target.style.setProperty('cursor', window._tronCursors.default, 'important');
+        return;
+      }
+      var t   = e.target.closest("a, button, [role='button'], input[type='submit'], input[type='button']");
+      var inp = e.target.closest("input:not([type='submit']):not([type='button']), textarea, [contenteditable]");
+      if (t)   { t.style.cursor   = window._tronCursors.pointer; return; }
+      if (inp) { inp.style.cursor = window._tronCursors.text;    return; }
+    });
+    document.addEventListener("mouseout", function (e) {
+      var t   = e.target.closest("a, button, [role='button'], input[type='submit'], input[type='button']");
+      var inp = e.target.closest("input:not([type='submit']):not([type='button']), textarea, [contenteditable]");
+      if (t)   { t.style.cursor   = ""; return; }
+      if (inp) { inp.style.cursor = ""; return; }
+    });
+  } catch (e) {
+    console.warn("[Tron Cursor] Could not apply custom cursors:", e);
+  }
+})();
+</script>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   </head>
@@ -19,15 +66,15 @@
           </div>
         </div>
       </div>
-<div id="ios-warning" style="display: none;">
-  iPhone users: Turn off Silent Mode to hear audio through speakers!
-</div>
-<div id="ui-panel">
-<div id="scrollLeft" class="scroll-arrow">❮</div>
-<div id="thumbnailContainer" class="song-thumbnails"></div>
-<div id="scrollRight" class="scroll-arrow">❯</div>
-</div>
-<div id="song-title" class="song-title">Click a song to play</div>
+      <div id="ios-warning" style="display: none;">
+        iPhone users: Turn off Silent Mode to hear audio through speakers!
+      </div>
+      <div id="ui-panel">
+        <div id="scrollLeft" class="scroll-arrow">❮</div>
+        <div id="thumbnailContainer" class="song-thumbnails"></div>
+        <div id="scrollRight" class="scroll-arrow">❯</div>
+      </div>
+      <div id="song-title" class="song-title">Click a song to play</div>
       <div id="controls">
         <button id="playPauseBtn">▶</button>
         <button id="replayBtn">⟲</button>
@@ -41,11 +88,9 @@
   function isMobileDevice() {
     return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   }
-
   const script = document.createElement('script');
   script.src = isMobileDevice() ? 'sketch_mobile.js' : 'sketch.js';
   document.body.appendChild(script);
 </script>
   </body>
 </html>
-
