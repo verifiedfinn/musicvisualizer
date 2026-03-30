@@ -225,8 +225,6 @@ scrubber.addEventListener('input', (e) => {
   }
 });
 
-
-
   volumeSlider.addEventListener('input', () => {
     if (currentSongIndex >= 0) {
       soundFiles[currentSongIndex].setVolume(muted ? 0 : parseFloat(volumeSlider.value));
@@ -239,6 +237,7 @@ function updatePlayPauseIcon() {
 }
 
 function draw() {
+  if (window._tronCursors) canvas.elt.style.cursor = window._tronCursors.default;
   background(0);
   t += 0.01;
 
@@ -262,7 +261,6 @@ colorPalette = {
   bufferGraphics.background(0, 25);
   bufferGraphics.push();
   bufferGraphics.translate(width / 2, height / 2 - 125);
-  
 
   if (!started || currentSongIndex === -1) {
     particles.forEach(p => p.update(false));
@@ -414,4 +412,3 @@ function updateSongTitle(i) {
     titleEl.style.display = 'block'; // show it when song starts
   }
 }
-
