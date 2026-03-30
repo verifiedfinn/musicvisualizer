@@ -20,13 +20,23 @@
       notAllowed: "url('" + BASE + "cursor_unavail." + ext + "') 0 0, not-allowed"
     };
     document.documentElement.style.cursor = window._tronCursors.default;
-    // Force canvas cursor via injected style tag — beats p5's inline style
+    // Force canvas cursor via injected style tag
     var styleTag = document.createElement('style');
     styleTag.textContent = 'canvas { cursor: ' + window._tronCursors.default + ' !important; }';
     document.head.appendChild(styleTag);
+    // Watch for p5 overriding canvas cursor and fight back
+    var observer = new MutationObserver(function() {
+      var canvases = document.querySelectorAll('canvas');
+      canvases.forEach(function(c) {
+        if (c.style.cursor !== window._tronCursors.default) {
+          c.style.setProperty('cursor', window._tronCursors.default, 'important');
+        }
+      });
+    });
+    observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['style'] });
     document.addEventListener("mouseover", function (e) {
       if (e.target.tagName && e.target.tagName.toLowerCase() === 'canvas') {
-        e.target.style.cursor = window._tronCursors.default;
+        e.target.style.setProperty('cursor', window._tronCursors.default, 'important');
         return;
       }
       var t   = e.target.closest("a, button, [role='button'], input[type='submit'], input[type='button']");
