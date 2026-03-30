@@ -250,7 +250,7 @@ body {
   letter-spacing: 2px;
   text-align: center;
 
-  /* Add this to make sure canvas isn’t bleeding through */
+  /* Add this to make sure canvas isn't bleeding through */
   backdrop-filter: blur(0); /* Optional – useful for transparent overlays */
   pointer-events: auto;
 }
@@ -404,4 +404,6 @@ body {
   }
 }
 
-
+canvas {
+  cursor: url('https://raw.githubusercontent.com/verifiedfinn/site-assets/main/cursors/cursor_normal.cur') 0 0, auto !important;
+}
