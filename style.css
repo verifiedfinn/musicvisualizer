@@ -250,7 +250,7 @@ body {
   letter-spacing: 2px;
   text-align: center;
 
-  /* Add this to make sure canvas isn’t bleeding through */
+  /* Add this to make sure canvas isn't bleeding through */
   backdrop-filter: blur(0); /* Optional – useful for transparent overlays */
   pointer-events: auto;
 }
@@ -289,7 +289,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   color: cyan;
-  font-size: 8px;
+  font-size: 6px;
   font-family: monospace;
   background: rgba(0, 0, 0, 0.4);
   padding: 5px 12px;
@@ -297,19 +297,6 @@ body {
   z-index: 10;
   pointer-events: none;
   white-space: nowrap;
-}
-
-#ios-warning {
-  font-size: 13px;
-  color: #ffcc00;
-  background-color: #222;
-  padding: 8px 12px;
-  text-align: center;
-  font-weight: bold;
-  border-radius: 10px;
-  margin: 12px auto -4px;
-  max-width: 90%;
-  z-index: 1000;
 }
 
 /* ---- Responsive Design for Mobile ---- */
@@ -417,3 +404,7 @@ body {
   }
 }
 
+canvas {
+  pointer-events: none;
+  cursor: url('https://raw.githubusercontent.com/verifiedfinn/site-assets/main/cursors/cursor_normal.cur') 0 0, auto !important;
+}
