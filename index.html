@@ -28,13 +28,13 @@
         e.target.style.setProperty('cursor', window._tronCursors.default, 'important');
         return;
       }
-      var t   = e.target.closest("a, button, [role='button'], input[type='submit'], input[type='button']");
+      var t   = e.target.closest("a, button, [role='button'], input[type='submit'], input[type='button'], .scroll-arrow, .thumbnail, .thumbnail-container, img");
       var inp = e.target.closest("input:not([type='submit']):not([type='button']), textarea, [contenteditable]");
       if (t)   { t.style.cursor   = window._tronCursors.pointer; return; }
       if (inp) { inp.style.cursor = window._tronCursors.text;    return; }
     });
     document.addEventListener("mouseout", function (e) {
-      var t   = e.target.closest("a, button, [role='button'], input[type='submit'], input[type='button']");
+      var t   = e.target.closest("a, button, [role='button'], input[type='submit'], input[type='button'], .scroll-arrow, .thumbnail, .thumbnail-container, img");
       var inp = e.target.closest("input:not([type='submit']):not([type='button']), textarea, [contenteditable]");
       if (t)   { t.style.cursor   = window._tronCursors.default; return; }
       if (inp) { inp.style.cursor = window._tronCursors.default; return; }
