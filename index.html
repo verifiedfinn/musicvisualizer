@@ -20,6 +20,10 @@
       notAllowed: "url('" + BASE + "cursor_unavail." + ext + "') 0 0, not-allowed"
     };
     document.documentElement.style.cursor = window._tronCursors.default;
+    // Force canvas cursor via injected style tag — beats p5's inline style
+    var styleTag = document.createElement('style');
+    styleTag.textContent = 'canvas { cursor: ' + window._tronCursors.default + ' !important; }';
+    document.head.appendChild(styleTag);
     document.addEventListener("mouseover", function (e) {
       if (e.target.tagName && e.target.tagName.toLowerCase() === 'canvas') {
         e.target.style.cursor = window._tronCursors.default;
