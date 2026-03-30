@@ -23,15 +23,6 @@
     var styleTag = document.createElement('style');
     styleTag.textContent = 'canvas { cursor: ' + window._tronCursors.default + ' !important; }';
     document.head.appendChild(styleTag);
-    var observer = new MutationObserver(function() {
-      var canvases = document.querySelectorAll('canvas');
-      canvases.forEach(function(c) {
-        if (c.style.cursor !== window._tronCursors.default) {
-          c.style.setProperty('cursor', window._tronCursors.default, 'important');
-        }
-      });
-    });
-    observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['style'] });
     document.addEventListener("mouseover", function (e) {
       if (e.target.tagName && e.target.tagName.toLowerCase() === 'canvas') {
         e.target.style.setProperty('cursor', window._tronCursors.default, 'important');
